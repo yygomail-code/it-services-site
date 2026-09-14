@@ -29,3 +29,35 @@ CREATE TABLE IF NOT EXISTS leads (
   KEY idx_lead_type (lead_type),
   KEY idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
+-- Пользователи админки (CRM)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS users (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  login VARCHAR(64) NOT NULL,
+  email VARCHAR(255) DEFAULT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  role ENUM('client', 'manager', 'admin') NOT NULL DEFAULT 'client',
+  full_name VARCHAR(255) DEFAULT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_login_at DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_login (login),
+  UNIQUE KEY uq_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------
+-- Содержимое сайта (редактируется админом)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS site_content (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  content_key VARCHAR(128) NOT NULL,
+  content_value TEXT,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  updated_by BIGINT UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_content_key (content_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

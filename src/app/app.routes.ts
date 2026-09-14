@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminAuthGuard, adminOnlyGuard } from './services/admin.guard';
 
 export const routes: Routes = [
   {
@@ -41,6 +42,37 @@ export const routes: Routes = [
   {
     path: 'terms',
     loadComponent: () => import('./pages/terms/terms.component').then((m) => m.TermsComponent),
+  },
+  {
+    path: 'admin/login',
+    loadComponent: () => import('./admin/admin-login/admin-login.component').then((m) => m.AdminLoginComponent),
+  },
+  {
+    path: 'admin',
+    canActivate: [adminAuthGuard],
+    loadComponent: () => import('./admin/admin-layout/admin-layout.component').then((m) => m.AdminLayoutComponent),
+    children: [
+      {
+        path: 'leads',
+        loadComponent: () => import('./admin/admin-leads/admin-leads.component').then((m) => m.AdminLeadsComponent),
+      },
+      {
+        path: 'content',
+        canActivate: [adminOnlyGuard],
+        loadComponent: () => import('./admin/admin-content/admin-content.component').then((m) => m.AdminContentComponent),
+      },
+      {
+        path: 'users',
+        canActivate: [adminOnlyGuard],
+        loadComponent: () => import('./admin/admin-users/admin-users.component').then((m) => m.AdminUsersComponent),
+      },
+      {
+        path: 'settings',
+        canActivate: [adminOnlyGuard],
+        loadComponent: () => import('./admin/admin-settings/admin-settings.component').then((m) => m.AdminSettingsComponent),
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'leads' },
+    ],
   },
   {
     path: '**',

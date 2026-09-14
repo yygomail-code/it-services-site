@@ -1,0 +1,130 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div>
+      <h1>Лиды</h1>
+      <p class="text-muted">Всего: {{ totalCount }}</p>
+    </div>
+  </div>
+
+  <div class="admin-stats">
+    <button type="button" class="stat" [class.stat--active]="statusFilter === 'all'" (click)="setStatus('all')">
+      <strong>{{ totalCount }}</strong>
+      <span>Все</span>
+    </button>
+    <button type="button" class="stat" [class.stat--active]="statusFilter === 'new'" (click)="setStatus('new')">
+      <strong>{{ stats['new'] ?? 0 }}</strong>
+      <span>Новые</span>
+    </button>
+    <button type="button" class="stat" [class.stat--active]="statusFilter === 'in_progress'" (click)="setStatus('in_progress')">
+      <strong>{{ stats['in_progress'] ?? 0 }}</strong>
+      <span>В работе</span>
+    </button>
+    <button type="button" class="stat" [class.stat--active]="statusFilter === 'closed'" (click)="setStatus('closed')">
+      <strong>{{ stats['closed'] ?? 0 }}</strong>
+      <span>Закрытые</span>
+    </button>
+    <button type="button" class="stat" [class.stat--active]="statusFilter === 'rejected'" (click)="setStatus('rejected')">
+      <strong>{{ stats['rejected'] ?? 0 }}</strong>
+      <span>Отклонённые</span>
+    </button>
+  </div>
+
+  <div class="admin-toolbar">
+    <input
+      class="admin-input"
+      type="search"
+      placeholder="Поиск: имя, телефон, услуга…"
+      [value]="search"
+      (input)="onSearch($any($event.target).value)"
+    />
+    <select class="admin-input" [value]="typeFilter" (change)="setType($any($event.target).value)">
+      <option value="all">Все типы</option>
+      <option value="client">Клиенты</option>
+      <option value="partner">Партнёры</option>
+    </select>
+  </div>
+
+  @if (error) {
+    <p class="admin-error" role="alert">{{ error }}</p>
+  }
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else if (leads.length === 0) {
+    <p class="text-muted">Лидов не найдено</p>
+  } @else {
+    <div class="leads-list">
+      @for (lead of leads; track lead.id) {
+        <div class="lead" [class.lead--expanded]="expandedId === lead.id">
+          <button type="button" class="lead__main" (click)="toggle(lead.id)">
+            <div class="lead__info">
+              <span class="lead__name">{{ lead.name }}</span>
+              <span class="lead__phone">{{ lead.phone }}</span>
+              <span class="lead__meta">
+                {{ typeLabels[lead.lead_type] ?? lead.lead_type }}
+                @if (lead.lead_type === 'partner' && lead.partner_role) {
+                  · {{ lead.partner_role }}
+                }
+                @if (lead.service) {
+                  · {{ lead.service }}
+                }
+              </span>
+            </div>
+            <div class="lead__right">
+              <span class="lead__status" [class]="'lead__status--' + lead.status">
+                {{ statusLabels[lead.status] ?? lead.status }}
+              </span>
+              <span class="lead__date">{{ lead.created_at }}</span>
+            </div>
+          </button>
+
+          @if (expandedId === lead.id) {
+            <div class="lead__details">
+              @if (lead.message) {
+                <p class="lead__message">«{{ lead.message }}»</p>
+              }
+              <div class="lead__grid">
+                <span>Lead ID: <code>{{ lead.lead_id }}</code></span>
+                @if (lead.deal_type) {
+                  <span>Формат: {{ lead.deal_type }}</span>
+                }
+                @if (lead.utm_source || lead.utm_medium || lead.utm_campaign) {
+                  <span>
+                    Источник: {{ lead.utm_source || '—' }} / {{ lead.utm_medium || '—' }} / {{ lead.utm_campaign || '—' }}
+                  </span>
+                }
+                @if (lead.page) {
+                  <span>Страница: {{ lead.page }}</span>
+                }
+                @if (lead.telegram) {
+                  <span>Мессенджер: {{ lead.telegram }}</span>
+                }
+              </div>
+              <div class="lead__actions">
+                @for (status of ['new', 'in_progress', 'closed', 'rejected']; track status) {
+                  <button
+                    type="button"
+                    class="btn btn--small"
+                    [class.btn--primary]="lead.status === status"
+                    (click)="changeStatus(lead, status)"
+                  >
+                    {{ statusLabels[status] }}
+                  </button>
+                }
+                <button type="button" class="btn btn--small btn--danger" (click)="deleteLead(lead)">Удалить</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    @if (pages > 1) {
+      <div class="pagination">
+        <button type="button" class="btn btn--small" [disabled]="page <= 1" (click)="goToPage(page - 1)">←</button>
+        <span>Стр. {{ page }} из {{ pages }}</span>
+        <button type="button" class="btn btn--small" [disabled]="page >= pages" (click)="goToPage(page + 1)">→</button>
+      </div>
+    }
+  }
+</section>

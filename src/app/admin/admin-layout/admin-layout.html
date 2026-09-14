@@ -1,0 +1,35 @@
+<div class="admin">
+  <aside class="admin__sidebar">
+    <div class="admin__brand">
+      <span class="admin__brand-mark">Л</span>
+      <div>
+        <strong>Админка</strong>
+        <small>ИТ-услуги</small>
+      </div>
+    </div>
+
+    <nav class="admin__nav">
+      <a routerLink="/admin/leads" routerLinkActive="admin__link--active" [routerLinkActiveOptions]="{ exact: true }">Лиды</a>
+      @if (user()?.role === 'admin') {
+        <a routerLink="/admin/content" routerLinkActive="admin__link--active">Контент</a>
+        <a routerLink="/admin/users" routerLinkActive="admin__link--active">Пользователи</a>
+        <a routerLink="/admin/settings" routerLinkActive="admin__link--active">Настройки</a>
+      }
+    </nav>
+
+    <div class="admin__footer-nav">
+      <a routerLink="/" target="_blank">Открыть сайт</a>
+      <button type="button" class="admin__logout" (click)="logout()">Выйти</button>
+    </div>
+  </aside>
+
+  <main class="admin__content">
+    <div class="admin__topbar">
+      <span class="admin__user">
+        {{ user()?.full_name || user()?.login }}
+        <span class="admin__role">{{ user()?.role }}</span>
+      </span>
+    </div>
+    <router-outlet />
+  </main>
+</div>

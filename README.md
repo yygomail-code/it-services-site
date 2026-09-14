@@ -5,8 +5,9 @@
 ## Стек
 
 - **Фронт:** Angular 22 (standalone), SCSS, mobile-first, prerender/SSG
-- **Бэк:** PHP 8.x — `api/lead.php` (SMTP Яндекс + MySQL)
-- **БД:** MySQL, таблица `leads` (CRM-готовая)
+- **Бэк:** PHP 8.x — `api/lead.php` (SMTP Яндекс + MySQL), админка-API (`api/auth.php`, `api/leads.php`, `api/content.php`, `api/users.php`)
+- **БД:** MySQL/MariaDB — таблицы `leads`, `users`, `site_content`
+- **Админка:** `/admin` (авторизация, роли клиент/менеджер/админ, лиды, контент, пользователи, настройки)
 - **SEO:** prerender-HTML, meta, JSON-LD (Organization/Service/FAQ), sitemap.xml, robots.txt
 
 ## Команды
@@ -33,29 +34,50 @@ npm run dev:stop     # остановка локальной среды
 Шлюз: `POST http://127.0.0.1:8090/api/lead.php`.
 Конфигурация шлюза: `api/.env` (скопируйте `api/.env.example`). Режим `APP_ENV=dev` — письмо не отправляется, только запись в БД.
 
+Dev-сервер Angular проксирует `/api/*` на `http://127.0.0.1:8090` (см. `proxy.conf.json`), поэтому формы и админка работают через `http://localhost:4200`.
+
+## Админка
+
+- URL: `http://localhost:4200/admin/login`
+- Пользователь по умолчанию: **admin / admin123** (создаётся из `db/seed.sql`; смените пароль!)
+- Роли:
+  - **client** — учётка создаётся, доступа к админке нет
+  - **manager** — лиды (просмотр, статусы, удаление)
+  - **admin** — лиды + контент + пользователи + настройки
+- Контент, изменённый админом (таблица `site_content`), подставляется на сайт автоматически (телефон, город, заголовок главной и др.)
+
 ## Структура
 
 ```
 src/app/
-  components/   header, footer, lead-form, service-card, case-card
+  components/   header, footer, lead-form, service-card, case-card, cookie-consent
   data/         services.data.ts, portfolio.data.ts, partners.data.ts
-  models/       content.model.ts, lead.model.ts
-  pages/        home, services, service-detail, portfolio, portfolio-detail, about, partners, contacts, policy
-  services/     content.service.ts, lead.service.ts, utm.service.ts, seo.service.ts
+  models/       content.model.ts, lead.model.ts, admin.model.ts
+  pages/        home, services, service-detail, portfolio, portfolio-detail, about, partners, contacts, policy, terms
+  services/     content.service.ts, lead.service.ts, utm.service.ts, seo.service.ts, auth.service.ts, admin.service.ts, admin.guard.ts
+  admin/        admin-layout, admin-login, admin-leads, admin-content, admin-users, admin-settings
 api/
   lead.php      шлюз лидов (SMTP + MySQL)
+  bootstrap.php общий bootstrap (БД, сессии, CSRF, роли)
+  auth.php      авторизация (login/logout/me/csrf)
+  leads.php     лиды (список/статус/удаление) — manager, admin
+  content.php   контент сайта (чтение — публично, запись — admin)
+  users.php     пользователи (admin)
   .env.example  пример окружения
 db/
-  schema.sql    схема таблицы leads
+  schema.sql    схема БД (leads, users, site_content)
+  seed.sql      начальный админ (admin/admin123)
 public/
   robots.txt, sitemap.xml, favicon.ico, logo.svg
+proxy.conf.json прокси /api → 127.0.0.1:8090 (dev)
 ```
 
 ## Развёртывание
 
 1. `npm run build:static` → папка `dist/it-services/browser` (чистый HTML)
-2. Залить на хостинг: содержимое `browser/` в корень сайта, `api/lead.php` — вне публичной статики
-3. Создать БД по `db/schema.sql`, заполнить `.env` (APP_ENV=prod, SMTP, MAIL_TO)
-4. Настроить nginx/apache: отдача статики, POST `/api/lead.php` → PHP, SSL
+2. Залить на хостинг: содержимое `browser/` в корень сайта, `api/` — в каталог PHP
+3. Создать БД по `db/schema.sql` + `db/seed.sql`, заполнить `.env` (APP_ENV=prod, SMTP, MAIL_TO)
+4. Настроить nginx/apache: отдача статики, `/api/*.php` → PHP, SSL
+5. Админка рендерится на клиенте (`/admin/**` — без prerender), поэтому доступна с любого хостинга
 
 Подробности — в CONTEXT.md, HANDOFF.md, PROMPT.md.

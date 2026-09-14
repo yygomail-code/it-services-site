@@ -17,14 +17,25 @@ export class HomeComponent implements OnInit {
   services: Service[] = [];
   cases: PortfolioCase[] = [];
 
+  heroTitle = '';
+  heroSubtitle = '';
+
   constructor(
-    private content: ContentService,
+    public content: ContentService,
     private seo: SeoService,
   ) {}
 
   ngOnInit(): void {
     this.services = this.content.getServices();
     this.cases = this.content.getCases();
+    this.heroTitle = this.content.get(
+      'main.heroTitle',
+      'Разработка сайтов, CRM и автоматизация, которые приводят клиентов',
+    );
+    this.heroSubtitle = this.content.get(
+      'main.heroSubtitle',
+      'Создаю сайты и системы, которые работают на ваш бизнес: привлекают заявки, ускоряют процессы и экономят время. Работаю удалённо по всей России, возможен выезд к заказчику.',
+    );
     this.seo.setSeo({
       title: 'Разработка и сопровождение сайтов, CRM, БД, корпоративного софта — ИТ-услуги',
       description:

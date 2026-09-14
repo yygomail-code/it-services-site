@@ -1,0 +1,44 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div>
+      <h1>Настройки</h1>
+      <p class="text-muted">Ключевые настройки сайта: контакты и главные тексты</p>
+    </div>
+  </div>
+
+  @if (error) {
+    <p class="admin-error">{{ error }}</p>
+  }
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else {
+    <div class="settings-list">
+      @for (item of settings; track item.key) {
+        <div class="settings-item">
+          <div class="settings-item__head">
+            <label class="settings-item__label">{{ item.label }}</label>
+            <div class="settings-item__actions">
+              @if (savedKey === item.key) {
+                <span class="saved">✓ Сохранено</span>
+              }
+              <button type="button" class="btn btn--small" (click)="save(item)">Сохранить</button>
+            </div>
+          </div>
+          <input
+            class="admin-input settings-item__input"
+            type="text"
+            [value]="item.value"
+            placeholder="Значение"
+            (input)="setValue(item, $any($event.target).value)"
+          />
+        </div>
+      }
+    </div>
+
+    <p class="text-muted admin-hint">
+      Эти настройки подставляются на сайт из базы данных. Если поле пустое — используется
+      значение по умолчанию из кода.
+    </p>
+  }
+</section>

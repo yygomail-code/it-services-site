@@ -31,9 +31,9 @@
 
       <div class="footer__col">
         <h3>Контакты</h3>
-        <a class="footer__phone" href="tel:+79380264903">8 (938) 026-49-03</a>
-        <a href="mailto:hello@example.ru">hello@example.ru</a>
-        <p class="footer__work">Краснодар · Ежедневно с 9:00 до 21:00 (МСК)</p>
+        <a class="footer__phone" [href]="phoneHref">{{ phone }}</a>
+        <a [href]="'mailto:' + email">{{ email }}</a>
+        <p class="footer__work">{{ city }} · Ежедневно с 9:00 до 21:00 (МСК)</p>
       </div>
     </div>
 

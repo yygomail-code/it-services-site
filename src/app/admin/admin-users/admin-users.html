@@ -1,0 +1,94 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div>
+      <h1>Пользователи</h1>
+      <p class="text-muted">Учётные записи админки: клиент, менеджер, админ</p>
+    </div>
+    <button type="button" class="btn btn--primary" (click)="openCreate()">+ Добавить</button>
+  </div>
+
+  @if (error) {
+    <p class="admin-error">{{ error }}</p>
+  }
+
+  @if (showCreate) {
+    <div class="user-form card">
+      <h2>Новый пользователь</h2>
+      <div class="user-form__grid">
+        <input class="admin-input" type="text" placeholder="Логин *" [(ngModel)]="newLogin" />
+        <input class="admin-input" type="text" placeholder="Имя" [(ngModel)]="newName" />
+        <input class="admin-input" type="email" placeholder="Email" [(ngModel)]="newEmail" />
+        <input class="admin-input" type="password" placeholder="Пароль *" [(ngModel)]="newPassword" />
+        <select class="admin-input" [(ngModel)]="newRole">
+          <option value="client">Клиент</option>
+          <option value="manager">Менеджер</option>
+          <option value="admin">Админ</option>
+        </select>
+      </div>
+      @if (createError) {
+        <p class="admin-error">{{ createError }}</p>
+      }
+      <div class="user-form__actions">
+        <button type="button" class="btn btn--primary" (click)="createUser()">Создать</button>
+        <button type="button" class="btn btn--outline" (click)="showCreate = false">Отмена</button>
+      </div>
+    </div>
+  }
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else if (users.length === 0) {
+    <p class="text-muted">Пользователей нет</p>
+  } @else {
+    <div class="users-table">
+      <div class="users-table__head">
+        <span>Пользователь</span>
+        <span>Роль</span>
+        <span>Статус</span>
+        <span>Последний вход</span>
+        <span></span>
+      </div>
+
+      @for (user of users; track user.id) {
+        @if (editingId === user.id) {
+          <div class="users-table__row users-table__row--edit">
+            <span><strong>{{ user.login }}</strong></span>
+            <select class="admin-input" [(ngModel)]="editRole">
+              <option value="client">Клиент</option>
+              <option value="manager">Менеджер</option>
+              <option value="admin">Админ</option>
+            </select>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="editActive" />
+              <span>Активен</span>
+            </label>
+            <input class="admin-input" type="password" placeholder="Новый пароль (опц.)" [(ngModel)]="editPassword" />
+            <div class="users-table__actions">
+              @if (editError) {
+                <span class="admin-error">{{ editError }}</span>
+              }
+              <button type="button" class="btn btn--small" (click)="saveEdit(user)">Сохранить</button>
+              <button type="button" class="btn btn--small" (click)="cancelEdit()">Отмена</button>
+            </div>
+          </div>
+        } @else {
+          <div class="users-table__row">
+            <span>
+              <strong>{{ user.full_name || user.login }}</strong>
+              <small class="text-muted">{{ user.login }}{{ user.email ? ' · ' + user.email : '' }}</small>
+            </span>
+            <span class="user-role">{{ roles[user.role] ?? user.role }}</span>
+            <span [class.text-muted]="user.active !== 1" [style.color]="user.active === 1 ? 'var(--color-success)' : 'var(--color-danger)'">
+              {{ user.active === 1 ? 'Активен' : 'Отключён' }}
+            </span>
+            <span class="text-muted">{{ user.last_login_at || 'никогда' }}</span>
+            <div class="users-table__actions">
+              <button type="button" class="btn btn--small" (click)="startEdit(user)">Изменить</button>
+              <button type="button" class="btn btn--small btn--danger" (click)="deleteUser(user)">Удалить</button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+</section>
