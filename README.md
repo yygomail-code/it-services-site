@@ -17,7 +17,21 @@ npm start            # dev-сервер http://localhost:4200
 npm run build        # production-сборка (SSR + prerender) → dist/it-services
 npm run build:static # статическая сборка (только HTML, без Node) → dist
 npm test             # unit-тесты (Vitest)
+
+npm run dev:start    # запуск локальной среды: MariaDB + PHP dev-сервер (http://127.0.0.1:8090)
+npm run dev:stop     # остановка локальной среды
 ```
+
+## Локальная среда (Windows)
+
+Установлены portable-версии:
+- **PHP 8.5.10 NTS x64** → `C:\php` (в PATH)
+- **MariaDB 11.4.13** (совместима с MySQL, тот же протокол/PDO) → `C:\mariadb`, данные в `C:\mariadb-data`
+- БД `it_services`, таблица `leads` созданы по `db/schema.sql`
+
+Запуск: `npm run dev:start` (поднимет MariaDB на 3306 и PHP на 8090).
+Шлюз: `POST http://127.0.0.1:8090/api/lead.php`.
+Конфигурация шлюза: `api/.env` (скопируйте `api/.env.example`). Режим `APP_ENV=dev` — письмо не отправляется, только запись в БД.
 
 ## Структура
 

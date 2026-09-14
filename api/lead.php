@@ -16,6 +16,36 @@ header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 
 // ---------------------------------------------------------------------
+// Загрузка .env (если файл есть рядом)
+// ---------------------------------------------------------------------
+function loadEnv(string $file): void
+{
+    if (!is_file($file)) {
+        return;
+    }
+    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        return;
+    }
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || $line[0] === '#' || !str_contains($line, '=')) {
+            continue;
+        }
+        [$key, $value] = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+        if ($key === '' || getenv($key) !== false) {
+            continue;
+        }
+        putenv($key . '=' . $value);
+        $_ENV[$key] = $value;
+    }
+}
+
+loadEnv(__DIR__ . '/.env');
+
+// ---------------------------------------------------------------------
 // Только POST
 // ---------------------------------------------------------------------
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
@@ -87,6 +117,17 @@ $utmSource = trim((string) ($data['utm_source'] ?? ''));
 $utmMedium = trim((string) ($data['utm_medium'] ?? ''));
 $utmCampaign = trim((string) ($data['utm_campaign'] ?? ''));
 $page = trim((string) ($data['page'] ?? ''));
+
+// Пустые строки для опциональных/ENUM-полей → NULL (иначе MySQL ругается на ENUM)
+$nullIfEmpty = static fn (string $v): ?string => $v === '' ? null : $v;
+$partnerRole = $nullIfEmpty($partnerRole);
+$dealType = $nullIfEmpty($dealType);
+$service = $nullIfEmpty($service);
+$message = $nullIfEmpty($message);
+$utmSource = $nullIfEmpty($utmSource);
+$utmMedium = $nullIfEmpty($utmMedium);
+$utmCampaign = $nullIfEmpty($utmCampaign);
+$page = $nullIfEmpty($page);
 
 // Уникальный ID лида
 $leadId = date('YmdHis') . '-' . bin2hex(random_bytes(4));
