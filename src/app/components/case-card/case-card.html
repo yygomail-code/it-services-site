@@ -1,0 +1,14 @@
+<a class="case-card" [routerLink]="['/portfolio', case.slug]">
+  <div class="case-card__image">
+    <span>{{ case.category }}</span>
+  </div>
+  <div class="case-card__body">
+    <h3>{{ case.title }}</h3>
+    <p>{{ case.shortDescription }}</p>
+    <div class="case-card__tags">
+      @for (tag of case.tags; track tag) {
+        <span class="tag">{{ tag }}</span>
+      }
+    </div>
+  </div>
+</a>

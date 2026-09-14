@@ -1,0 +1,10 @@
+<a class="service-card" [routerLink]="['/services', service.slug]">
+  <div class="service-card__icon" aria-hidden="true">
+    <span>{{ service.icon }}</span>
+  </div>
+  <h3>{{ service.title }}</h3>
+  <p>{{ service.description }}</p>
+  @if (service.priceFrom) {
+    <span class="service-card__price">{{ service.priceFrom }}</span>
+  }
+</a>

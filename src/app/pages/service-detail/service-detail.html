@@ -1,0 +1,79 @@
+@if (service) {
+  <nav class="breadcrumbs" aria-label="Хлебные крошки">
+    <div class="container">
+      <a routerLink="/">Главная</a> / <a routerLink="/services">Услуги</a> /
+      <span>{{ service.title }}</span>
+    </div>
+  </nav>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="detail">
+        <div class="detail__content">
+          <span class="detail__icon" aria-hidden="true">{{ service.icon }}</span>
+          <h1>{{ service.title }}</h1>
+          <p class="detail__lead">{{ service.longDescription }}</p>
+
+          @if (service.priceFrom) {
+            <p class="detail__price">
+              Стоимость: <strong>{{ service.priceFrom }}</strong>
+            </p>
+          }
+        </div>
+        <aside class="detail__form">
+          <div class="card">
+            <h2>Заказать «{{ service.title }}»</h2>
+            <p class="text-muted">Оставьте контакты — свяжусь и уточню детали.</p>
+            <app-lead-form [service]="service.title" submitLabel="Отправить заявку" />
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container">
+      <h2>Что входит</h2>
+      <ul class="features">
+        @for (feature of service.features; track feature) {
+          <li>{{ feature }}</li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  @if (service.faq.length) {
+    <section class="section section--tight">
+      <div class="container">
+        <h2>Частые вопросы</h2>
+        <div class="faq">
+          @for (item of service.faq; track item.q) {
+            <details class="faq__item">
+              <summary>{{ item.q }}</summary>
+              <p>{{ item.a }}</p>
+            </details>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <section class="section section--cta">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Обсудить проект</h2>
+        <p>Расскажите о задаче — предложу решение и смету.</p>
+        <a class="btn btn--primary btn--lg" routerLink="/contacts">Связаться</a>
+      </div>
+    </div>
+  </section>
+} @else {
+  <section class="section">
+    <div class="container">
+      <h1>Услуга не найдена</h1>
+      <p class="text-muted">
+        Возможно, страница была перемещена. <a routerLink="/services">Вернуться к списку услуг</a>.
+      </p>
+    </div>
+  </section>
+}

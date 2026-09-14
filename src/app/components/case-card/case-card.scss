@@ -1,0 +1,52 @@
+.case-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--color-text);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.case-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.case-card__image {
+  display: grid;
+  place-items: center;
+  min-height: 140px;
+  background: linear-gradient(135deg, var(--color-primary-bg), var(--color-accent-bg));
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.case-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  flex-grow: 1;
+}
+
+.case-card__body h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.case-card__body p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  flex-grow: 1;
+}
+
+.case-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}

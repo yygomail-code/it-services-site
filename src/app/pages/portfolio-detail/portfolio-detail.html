@@ -1,0 +1,52 @@
+@if (case) {
+  <nav class="breadcrumbs" aria-label="Хлебные крошки">
+    <div class="container">
+      <a routerLink="/">Главная</a> / <a routerLink="/portfolio">Портфолио</a> /
+      <span>{{ case.title }}</span>
+    </div>
+  </nav>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="case-detail">
+        <div class="case-detail__main">
+          <span class="tag">{{ case.category }}</span>
+          <h1>{{ case.title }}</h1>
+          <p class="case-detail__lead">{{ case.shortDescription }}</p>
+          <p>{{ case.description }}</p>
+
+          @if (case.tags.length) {
+            <div class="case-detail__tags">
+              @for (tag of case.tags; track tag) {
+                <span class="tag">{{ tag }}</span>
+              }
+            </div>
+          }
+
+          @if (case.result) {
+            <div class="case-detail__result">
+              <h2>Результат</h2>
+              <p>{{ case.result }}</p>
+            </div>
+          }
+        </div>
+        <aside class="case-detail__form">
+          <div class="card">
+            <h2>Нужен похожий проект?</h2>
+            <p class="text-muted">Оставьте контакты — обсудим вашу задачу.</p>
+            <app-lead-form submitLabel="Обсудить проект" />
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+} @else {
+  <section class="section">
+    <div class="container">
+      <h1>Кейс не найден</h1>
+      <p class="text-muted">
+        <a routerLink="/portfolio">Вернуться к портфолио</a>.
+      </p>
+    </div>
+  </section>
+}

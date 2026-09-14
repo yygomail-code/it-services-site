@@ -1,0 +1,57 @@
+@if (!submitted) {
+  <form class="lead-form" [class.lead-form--compact]="compact" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <input type="text" formControlName="name" placeholder="Ваше имя" autocomplete="name" aria-label="Ваше имя" />
+    <input
+      type="tel"
+      formControlName="phone"
+      placeholder="Телефон"
+      autocomplete="tel"
+      aria-label="Телефон"
+      inputmode="tel"
+    />
+    <input type="text" formControlName="telegram" placeholder="Telegram или WhatsApp (необязательно)" autocomplete="off" aria-label="Telegram или WhatsApp" />
+
+    @if (leadType === 'partner') {
+      <select formControlName="partner_role" aria-label="Кто вы">
+        <option value="" disabled selected>Кто вы?</option>
+        @for (role of partnerRolesList; track role.value) {
+          <option [value]="role.value">{{ role.label }}</option>
+        }
+      </select>
+
+      <select formControlName="deal_type" aria-label="Формат сотрудничества">
+        <option value="" disabled selected>Формат сотрудничества</option>
+        @for (deal of dealTypesList; track deal.value) {
+          <option [value]="deal.value">{{ deal.label }}</option>
+        }
+      </select>
+    } @else {
+      <select formControlName="service" aria-label="Услуга">
+        <option value="" disabled selected>Какая услуга интересует?</option>
+        @for (service of servicesList; track service) {
+          <option [value]="service">{{ service }}</option>
+        }
+      </select>
+    }
+
+    <textarea formControlName="message" rows="3" placeholder="Коротко о задаче (необязательно)" aria-label="Сообщение"></textarea>
+
+    @if (error) {
+      <p class="lead-form__error" role="alert">{{ error }}</p>
+    }
+
+    <button type="submit" class="btn btn--primary btn--block" [disabled]="sending">
+      {{ sending ? 'Отправляем…' : submitLabel }}
+    </button>
+    <p class="lead-form__consent">
+      Нажимая кнопку, вы соглашаетесь с
+      <a routerLink="/policy" target="_blank">политикой конфиденциальности</a>
+    </p>
+  </form>
+} @else {
+  <div class="lead-form__success" role="status">
+    <div class="lead-form__success-icon">✓</div>
+    <h3>Заявка отправлена!</h3>
+    <p>Спасибо! Я свяжусь с вами в ближайшее время.</p>
+  </div>
+}

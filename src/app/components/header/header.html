@@ -1,0 +1,28 @@
+<header class="header">
+  <div class="container header__inner">
+    <a class="header__logo" routerLink="/" (click)="closeMenu()">
+      <span class="header__logo-mark">Л</span>
+      <span class="header__logo-text">Литвинов&nbsp;Антон<br /><small>разработка и сопровождение сайтов</small></span>
+    </a>
+
+    <nav class="header__nav" [class.header__nav--open]="menuOpen" aria-label="Главное меню">
+      <a routerLink="/" routerLinkActive="header__link--active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Главная</a>
+      <a routerLink="/services" routerLinkActive="header__link--active" (click)="closeMenu()">Услуги</a>
+      <a routerLink="/portfolio" routerLinkActive="header__link--active" (click)="closeMenu()">Портфолио</a>
+      <a routerLink="/about" routerLinkActive="header__link--active" (click)="closeMenu()">Обо мне</a>
+      <a routerLink="/partners" routerLinkActive="header__link--active" (click)="closeMenu()">Сотрудничество</a>
+      <a routerLink="/contacts" routerLinkActive="header__link--active" (click)="closeMenu()">Контакты</a>
+      <a class="header__cta" routerLink="/contacts" (click)="closeMenu()">Обсудить проект</a>
+    </nav>
+
+    <button
+      class="header__burger"
+      type="button"
+      aria-label="Открыть меню"
+      [attr.aria-expanded]="menuOpen"
+      (click)="toggleMenu()"
+    >
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
