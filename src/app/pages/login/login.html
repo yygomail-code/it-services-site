@@ -1,0 +1,22 @@
+<div class="login">
+  <form class="login__card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="login__brand">
+      <span class="login__brand-mark">Л</span>
+      <h1>Вход</h1>
+      <p class="text-muted">Личный кабинет клиента / админка</p>
+    </div>
+
+    <input type="text" formControlName="login" placeholder="Логин" autocomplete="username" aria-label="Логин" />
+    <input type="password" formControlName="password" placeholder="Пароль" autocomplete="current-password" aria-label="Пароль" />
+
+    @if (error) {
+      <p class="login__error" role="alert">{{ error }}</p>
+    }
+
+    <button type="submit" class="btn btn--primary btn--block" [disabled]="loading">
+      {{ loading ? 'Вход…' : 'Войти' }}
+    </button>
+
+    <a class="login__back" routerLink="/">← На сайт</a>
+  </form>
+</div>

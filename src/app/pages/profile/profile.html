@@ -1,0 +1,31 @@
+<section class="section section--tight">
+  <div class="container">
+    <div class="profile">
+      <h1>Личный кабинет</h1>
+
+      @if (user()) {
+        <div class="profile__card">
+          <p class="profile__hello">Здравствуйте, <strong>{{ user()?.full_name || user()?.login }}</strong>!</p>
+          <p class="text-muted">
+            Логин: {{ user()?.login }}
+            @if (user()?.email) {
+              · {{ user()?.email }}
+            }
+          </p>
+
+          <div class="profile__placeholder">
+            <h2>Раздел в разработке</h2>
+            <p>
+              Здесь будут ваши заявки, статусы обращений и история проектов. Раздел появится
+              в ближайшее время.
+            </p>
+          </div>
+
+          <button type="button" class="btn btn--outline" (click)="logout()">Выйти</button>
+        </div>
+      } @else {
+        <p class="text-muted">Проверяем авторизацию…</p>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,38 @@
+.profile {
+  max-width: 640px;
+}
+
+.profile__card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.profile__hello {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.profile__placeholder {
+  background: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.profile__placeholder h2 {
+  font-size: 1.05rem;
+}
+
+.profile__placeholder p {
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.profile .btn {
+  align-self: flex-start;
+}

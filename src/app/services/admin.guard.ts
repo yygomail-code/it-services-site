@@ -8,7 +8,10 @@ export const adminAuthGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   if (auth.user()) {
-    return auth.isManager() ? true : router.createUrlTree(['/admin/login']);
+    if (auth.isManager()) {
+      return true;
+    }
+    return router.createUrlTree(['/profile']);
   }
 
   return auth.fetchMe().pipe(
@@ -16,7 +19,10 @@ export const adminAuthGuard: CanActivateFn = () => {
       if (res.user && auth.isManager()) {
         return true;
       }
-      return router.createUrlTree(['/admin/login']);
+      if (res.user) {
+        return router.createUrlTree(['/profile']);
+      }
+      return router.createUrlTree(['/login']);
     }),
   );
 };

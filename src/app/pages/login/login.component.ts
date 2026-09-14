@@ -4,12 +4,12 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-admin-login',
+  selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './admin-login.html',
-  styleUrl: './admin-login.scss',
+  templateUrl: './login.html',
+  styleUrl: './login.scss',
 })
-export class AdminLoginComponent implements OnInit {
+export class LoginComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
@@ -24,13 +24,11 @@ export class AdminLoginComponent implements OnInit {
       password: ['', Validators.required],
     });
 
-    // Если уже авторизован — сразу в админку
     this.auth.fetchMe().subscribe((res) => {
-      if (res.user && (res.user.role === 'manager' || res.user.role === 'admin')) {
-        this.router.navigate(['/admin/leads']);
+      if (res.user) {
+        this.redirect(res.user.role);
       }
     });
-    // Гарантированно получаем CSRF до первой отправки
     this.auth.ensureCsrf().subscribe();
   }
 
@@ -47,7 +45,7 @@ export class AdminLoginComponent implements OnInit {
     this.auth.login(this.form.value.login, this.form.value.password).subscribe({
       next: (res) => {
         if (res.user) {
-          this.router.navigate(['/admin/leads']);
+          this.redirect(res.user.role);
         } else {
           this.error = res.error || 'Ошибка входа';
           this.loading = false;
@@ -58,5 +56,13 @@ export class AdminLoginComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  private redirect(role: string): void {
+    if (role === 'manager' || role === 'admin') {
+      this.router.navigate(['/admin/leads']);
+    } else {
+      this.router.navigate(['/profile']);
+    }
   }
 }

@@ -12,6 +12,15 @@
       <a routerLink="/about" routerLinkActive="header__link--active" (click)="closeMenu()">Обо мне</a>
       <a routerLink="/partners" routerLinkActive="header__link--active" (click)="closeMenu()">Сотрудничество</a>
       <a routerLink="/contacts" routerLinkActive="header__link--active" (click)="closeMenu()">Контакты</a>
+
+      @if (user()) {
+        <a class="header__auth" [routerLink]="profileLink" (click)="closeMenu()">
+          {{ user()?.full_name || user()?.login }}
+        </a>
+      } @else {
+        <a class="header__auth" routerLink="/login" (click)="closeMenu()">Войти</a>
+      }
+
       <a class="header__cta" routerLink="/contacts" (click)="closeMenu()">Обсудить проект</a>
     </nav>
 

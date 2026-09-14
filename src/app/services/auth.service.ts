@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, switchMap, of } from 'rxjs';
 import { User } from '../models/admin.model';
 
 interface AuthResponse {
@@ -24,6 +24,22 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
+  /** Получает CSRF-токен (вызывается при загрузке логина и перед мутациями). */
+  ensureCsrf(): Observable<AuthResponse> {
+    if (this.csrf) {
+      return of({ ok: true, csrf: this.csrf });
+    }
+    return this.http
+      .get<AuthResponse>(`${this.base}?action=csrf`, { withCredentials: true })
+      .pipe(
+        tap((res) => {
+          if (res.csrf) {
+            this.csrf = res.csrf;
+          }
+        }),
+      );
+  }
+
   fetchMe(): Observable<AuthResponse> {
     return this.http
       .get<AuthResponse>(`${this.base}?action=me`, { withCredentials: true })
@@ -40,37 +56,39 @@ export class AuthService {
   }
 
   login(login: string, password: string): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(
-        `${this.base}?action=login`,
-        { login, password, csrf: this.csrf },
-        { withCredentials: true, headers: this.csrfHeaders() },
-      )
-      .pipe(
-        tap((res) => {
-          if (res.user) {
-            this.user.set(res.user);
-          }
-          if (res.csrf) {
-            this.csrf = res.csrf;
-          }
-        }),
-      );
+    return this.ensureCsrf().pipe(
+      switchMap((csrfRes) =>
+        this.http.post<AuthResponse>(
+          `${this.base}?action=login`,
+          { login, password, csrf: csrfRes.csrf ?? this.csrf },
+          { withCredentials: true, headers: this.csrfHeaders() },
+        ),
+      ),
+      tap((res) => {
+        if (res.user) {
+          this.user.set(res.user);
+        }
+        if (res.csrf) {
+          this.csrf = res.csrf;
+        }
+      }),
+    );
   }
 
   logout(): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(
-        `${this.base}?action=logout`,
-        { csrf: this.csrf },
-        { withCredentials: true, headers: this.csrfHeaders() },
-      )
-      .pipe(
-        tap(() => {
-          this.user.set(null);
-          this.csrf = '';
-        }),
-      );
+    return this.ensureCsrf().pipe(
+      switchMap(() =>
+        this.http.post<AuthResponse>(
+          `${this.base}?action=logout`,
+          { csrf: this.csrf },
+          { withCredentials: true, headers: this.csrfHeaders() },
+        ),
+      ),
+      tap(() => {
+        this.user.set(null);
+        this.csrf = '';
+      }),
+    );
   }
 
   getCsrf(): string {

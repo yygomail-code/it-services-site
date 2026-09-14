@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminAuthGuard, adminOnlyGuard } from './services/admin.guard';
+import { authRequiredGuard } from './services/auth.guard';
 
 export const routes: Routes = [
   {
@@ -46,6 +47,15 @@ export const routes: Routes = [
   {
     path: 'admin/login',
     loadComponent: () => import('./admin/admin-login/admin-login.component').then((m) => m.AdminLoginComponent),
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
+    path: 'profile',
+    canActivate: [authRequiredGuard],
+    loadComponent: () => import('./pages/profile/profile.component').then((m) => m.ProfileComponent),
   },
   {
     path: 'admin',
