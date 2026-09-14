@@ -1,0 +1,19 @@
+# Зависимости/артефакты
+node_modules/
+dist/
+.angular/
+
+# Окружение и секреты
+.env
+*.local
+.env.local
+
+# Логи
+*.log
+npm-debug.log*
+
+# IDE/ОС
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
