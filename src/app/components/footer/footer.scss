@@ -98,6 +98,12 @@
   text-decoration: underline;
 }
 
+.footer__links {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 900px) {
   .footer__grid {
     grid-template-columns: repeat(2, 1fr);

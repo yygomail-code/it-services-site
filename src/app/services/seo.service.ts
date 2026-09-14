@@ -41,6 +41,7 @@ export class SeoService {
       provider: {
         '@type': 'Person',
         name: 'Литвинов Антон',
+        telephone: '+7 (938) 026-49-03',
         url: `${this.siteUrl}/about`,
       },
       areaServed: 'RU',

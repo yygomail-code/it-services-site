@@ -7,6 +7,15 @@
   margin-top: 1.5rem;
 }
 
-.policy p {
+.policy p,
+.policy li {
   color: var(--color-muted);
+}
+
+.policy ul {
+  padding-left: 1.2rem;
+  margin: 0 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
