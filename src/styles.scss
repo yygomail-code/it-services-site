@@ -25,6 +25,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
@@ -35,6 +36,8 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
 }
 
 h1,
@@ -73,6 +76,37 @@ img {
   max-width: var(--container);
   margin: 0 auto;
   padding: 0 1.25rem;
+}
+
+/* Защита от горизонтального переполнения: дочерние элементы grid/flex
+   могут сжиматься, длинные слова переносятся */
+.grid,
+[class*='__grid'] > *,
+[class*='-grid'] > * {
+  min-width: 0;
+}
+
+h1, h2, h3, h4, p, a, li, span, strong, small, label, td, th {
+  overflow-wrap: anywhere;
+}
+
+pre, code {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+table {
+  max-width: 100%;
+}
+
+/* Angular-компоненты по умолчанию inline — блокируем, чтобы не ломать вёрстку */
+app-lead-form,
+app-service-card,
+app-case-card,
+app-header,
+app-footer,
+app-cookie-consent {
+  display: block;
 }
 
 .section {

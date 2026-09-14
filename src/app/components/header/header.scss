@@ -21,6 +21,8 @@
   gap: 0.65rem;
   text-decoration: none;
   color: var(--color-text);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .header__logo-mark {
@@ -40,6 +42,10 @@
   font-weight: 700;
   font-size: 0.95rem;
   line-height: 1.15;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .header__logo-text small {
@@ -103,6 +109,7 @@
   border: 0;
   padding: 8px;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .header__burger span {
