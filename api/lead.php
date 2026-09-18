@@ -75,6 +75,7 @@ if (isset($data['website']) && $data['website'] !== '') {
 $leadType = ($data['lead_type'] ?? 'client') === 'partner' ? 'partner' : 'client';
 $partnerRole = $leadType === 'partner' ? trim((string) ($data['partner_role'] ?? '')) : '';
 $dealType = $leadType === 'partner' ? trim((string) ($data['deal_type'] ?? '')) : '';
+$telegram = trim((string) ($data['telegram'] ?? ''));
 $service = trim((string) ($data['service'] ?? ''));
 $message = trim((string) ($data['message'] ?? ''));
 $utmSource = trim((string) ($data['utm_source'] ?? ''));
@@ -86,6 +87,7 @@ $page = trim((string) ($data['page'] ?? ''));
 $nullIfEmpty = static fn (string $v): ?string => $v === '' ? null : $v;
 $partnerRole = $nullIfEmpty($partnerRole);
 $dealType = $nullIfEmpty($dealType);
+$telegram = $nullIfEmpty($telegram);
 $service = $nullIfEmpty($service);
 $message = $nullIfEmpty($message);
 $utmSource = $nullIfEmpty($utmSource);
@@ -113,10 +115,10 @@ try {
 
     $stmt = $pdo->prepare(
         'INSERT INTO leads
-            (lead_id, lead_type, partner_role, deal_type, name, phone, service, message,
+            (lead_id, lead_type, partner_role, deal_type, name, phone, telegram, service, message,
              utm_source, utm_medium, utm_campaign, page, status, created_at)
          VALUES
-            (:lead_id, :lead_type, :partner_role, :deal_type, :name, :phone, :service, :message,
+            (:lead_id, :lead_type, :partner_role, :deal_type, :name, :phone, :telegram, :service, :message,
              :utm_source, :utm_medium, :utm_campaign, :page, :status, NOW())'
     );
     $stmt->execute([
@@ -126,6 +128,7 @@ try {
         'deal_type' => $dealType,
         'name' => $name,
         'phone' => $phone,
+        'telegram' => $telegram,
         'service' => $service,
         'message' => $message,
         'utm_source' => $utmSource,
@@ -153,6 +156,7 @@ if ($dbOk) {
         'lead_id' => $leadId,
         'name' => $name,
         'phone' => $phone,
+        'telegram' => $telegram,
         'service' => $service,
         'message' => $message,
         'partner_role' => $partnerRole,
@@ -190,6 +194,9 @@ function leadMailText(string $leadType, array $d): string
     $lines[] = 'Телефон: ' . $d['phone'];
     if (!empty($d['service'])) {
         $lines[] = 'Услуга: ' . $d['service'];
+    }
+    if (!empty($d['telegram'])) {
+        $lines[] = 'Telegram: ' . $d['telegram'];
     }
     if (!empty($d['partner_role'])) {
         $lines[] = 'Роль партнёра: ' . $d['partner_role'];
