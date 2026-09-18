@@ -1,0 +1,210 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div class="footer-head">
+      <h1>Футер</h1>
+      <div class="footer-actions">
+        @if (saved) {
+          <span class="admin-saved">✓ Сохранено</span>
+        }
+        <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving">
+          {{ saving ? 'Сохранение…' : 'Сохранить' }}
+        </button>
+      </div>
+    </div>
+    <p class="text-muted">Верхняя часть подвала сайта: логотип, колонки ссылок, контакты</p>
+  </div>
+
+  @if (error) {
+    <p class="admin-error">{{ error }}</p>
+  }
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else {
+    <div class="footer-form">
+      <!-- Описание -->
+      <div class="footer-card">
+        <h3>Описание</h3>
+        <p class="footer-hint">
+          Логотип, название и метка — общие для сайта, настраиваются в разделе «Бренд».
+          Здесь — подпись и примечание футера.
+        </p>
+
+        <div class="logo-rows">
+
+          <div class="logo-row">
+            <span class="logo-row__label">Подпись</span>
+            <input class="admin-input" [value]="aboutSubtitle" (input)="onAboutSubtitle($any($event.target).value)" placeholder="ИТ-услуги: сайты, CRM, БД" />
+            <button
+              type="button"
+              class="row-opt row-opt--letter"
+              [class.row-opt--on]="aboutRows.subtitle.large"
+              [title]="aboutRows.subtitle.large ? 'Обычный размер' : 'Крупнее'"
+              (click)="toggleAboutRowLarge('subtitle', !aboutRows.subtitle.large)"
+            >A</button>
+            <button
+              type="button"
+              class="row-opt"
+              [class.row-opt--on]="aboutRows.subtitle.gap"
+              [title]="aboutRows.subtitle.gap ? 'Убрать отступ сверху' : 'Добавить отступ сверху'"
+              (click)="toggleAboutRowGap('subtitle', !aboutRows.subtitle.gap)"
+            >↕</button>
+          </div>
+
+          <div class="logo-row">
+            <span class="logo-row__label">Примечание</span>
+            <textarea class="admin-textarea" [value]="aboutNote" (input)="onAboutNote($any($event.target).value)" rows="2" placeholder="Работаю удалённо по всей России…"></textarea>
+            <button
+              type="button"
+              class="row-opt row-opt--letter"
+              [class.row-opt--on]="aboutRows.note.large"
+              [title]="aboutRows.note.large ? 'Обычный размер' : 'Крупнее'"
+              (click)="toggleAboutRowLarge('note', !aboutRows.note.large)"
+            >A</button>
+            <button
+              type="button"
+              class="row-opt"
+              [class.row-opt--on]="aboutRows.note.gap"
+              [title]="aboutRows.note.gap ? 'Убрать отступ сверху' : 'Добавить отступ сверху'"
+              (click)="toggleAboutRowGap('note', !aboutRows.note.gap)"
+            >↕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Колонки ссылок -->
+      <div class="footer-card">
+        <div class="footer-card__head">
+          <h3>Колонки ссылок</h3>
+          <button type="button" class="btn btn--small" (click)="addColumn()">+ Колонка</button>
+        </div>
+
+        @if (columns.length === 0) {
+          <p class="text-muted">Колонок нет. Добавьте первую колонку ссылок.</p>
+        }
+
+        <div class="footer-columns">
+          @for (col of columns; track trackCol($index); let ci = $index) {
+            <div class="footer-column">
+              <div class="footer-column__head">
+                <input
+                  class="admin-input"
+                  [value]="col.title"
+                  (input)="onColumnTitle(ci, $any($event.target).value)"
+                  placeholder="Название колонки (Услуги, Разделы…)"
+                />
+                <div class="footer-column__tools">
+                  <button type="button" class="btn-icon" title="Вверх" (click)="moveColumn(ci, -1)">↑</button>
+                  <button type="button" class="btn-icon" title="Вниз" (click)="moveColumn(ci, 1)">↓</button>
+                  <button type="button" class="btn-icon btn-icon--danger" title="Удалить колонку" (click)="removeColumn(ci)">✕</button>
+                </div>
+              </div>
+
+              <div class="footer-links">
+                @for (link of col.links; track $index; let li = $index) {
+                  <div class="footer-link">
+                    <app-admin-link-editor [link]="link" [pages]="pages" [catalog]="linkTargets" />
+                    <button
+                      type="button"
+                      class="row-opt row-opt--eye"
+                      [class.row-opt--eye-all]="visibilityLevel(link) === 'all'"
+                      [class.row-opt--eye-partial]="visibilityLevel(link) === 'partial'"
+                      [class.row-opt--eye-none]="visibilityLevel(link) === 'none'"
+                      [title]="visibilityTitle(link)"
+                      (click)="openVisibility(ci, li)"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="row-opt row-opt--letter"
+                      [class.row-opt--on]="link.large"
+                      [title]="link.large ? 'Обычный размер' : 'Крупнее'"
+                      (click)="toggleLinkLarge(ci, li, !link.large)"
+                    >A</button>
+                    <button
+                      type="button"
+                      class="row-opt"
+                      [class.row-opt--on]="link.gap"
+                      [title]="link.gap ? 'Убрать отступ сверху' : 'Добавить отступ сверху'"
+                      (click)="toggleLinkGap(ci, li, !link.gap)"
+                    >↕</button>
+                    <div class="footer-link__tools">
+                      <button type="button" class="btn-icon" title="Вверх" (click)="moveLink(ci, li, -1)">↑</button>
+                      <button type="button" class="btn-icon" title="Вниз" (click)="moveLink(ci, li, 1)">↓</button>
+                    </div>
+                    <button type="button" class="btn-icon btn-icon--danger" title="Удалить ссылку" (click)="removeLink(ci, li)">✕</button>
+                  </div>
+                } @empty {
+                  <p class="text-muted footer-links__empty">Ссылок нет</p>
+                }
+                <button type="button" class="btn btn--small" (click)="addLink(ci)">+ Ссылка</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Контакты -->
+      <div class="footer-card">
+        <h3>Контакты</h3>
+        <p class="footer-hint">
+          Значения берутся из раздела «Контакты» и обновляются на сайте автоматически.
+          Здесь выберите, какие контакты показывать, их порядок и оформление.
+          Блок появится на сайте, если включён хотя бы один контакт с заполненным значением.
+        </p>
+        <div class="contact-rows">
+          @for (item of contactItems; track item.field; let i = $index) {
+            <div class="contact-row" [class.contact-row--off]="!item.show">
+              <label class="contact-row__toggle" [title]="item.show ? 'Скрыть в футере' : 'Показать в футере'">
+                <input type="checkbox" [checked]="item.show" (change)="toggleContact(i, $any($event.target).checked)" />
+              </label>
+              <span class="contact-row__label">{{ contactLabel(item.field) }}</span>
+              @if (contactValue(item.field)) {
+                <span class="contact-row__value">{{ contactValue(item.field) }}</span>
+              } @else {
+                <span class="contact-row__value contact-row__value--empty">не заполнено в «Контактах»</span>
+              }
+              <button
+                type="button"
+                class="contact-row__icon"
+                [class.contact-row__icon--on]="item.icon"
+                [title]="item.icon ? 'Скрыть иконку' : 'Показать иконку'"
+                (click)="toggleContactIcon(i, !item.icon)"
+              >
+                <app-contact-icon [field]="item.field" />
+              </button>
+              <button
+                type="button"
+                class="row-opt row-opt--letter"
+                [class.row-opt--on]="item.large"
+                [title]="item.large ? 'Обычный размер' : 'Крупнее'"
+                (click)="toggleContactLarge(i, !item.large)"
+              >A</button>
+              <button
+                type="button"
+                class="row-opt"
+                [class.row-opt--on]="item.gap"
+                [title]="item.gap ? 'Убрать отступ сверху' : 'Добавить отступ сверху'"
+                (click)="toggleContactGap(i, !item.gap)"
+              >↕</button>
+              <div class="contact-row__tools">
+                <button type="button" class="btn-icon" title="Вверх" (click)="moveContact(i, -1)">↑</button>
+                <button type="button" class="btn-icon" title="Вниз" (click)="moveContact(i, 1)">↓</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (visibilityOpen) {
+    <app-admin-roles-picker
+      [roles]="roles"
+      [selected]="visibilitySelected"
+      (applied)="applyVisibility($event)"
+      (closed)="closeVisibility()"
+    />
+  }
+</section>

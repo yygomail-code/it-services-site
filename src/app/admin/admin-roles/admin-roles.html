@@ -1,0 +1,91 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div class="roles-head">
+      <h1>Роли</h1>
+      @if (!formOpen) {
+        <button type="button" class="btn btn--primary" (click)="startCreate()">+ Роль</button>
+      }
+    </div>
+    <p class="text-muted">Роли используются для доступа к страницам, видимости ссылок и пунктов меню. Системные роли удалить нельзя, их код не меняется (название и порядок — можно). Добавленные роли редактируются и удаляются.</p>
+  </div>
+
+  @if (formOpen) {
+    <div class="roles-card">
+      <div class="roles-card__head">
+        <h3>{{ editingId ? 'Изменить роль' : 'Новая роль' }}</h3>
+        <div class="roles-card__head-actions">
+          <button type="button" class="btn btn--outline" (click)="cancelForm()">← Список ролей</button>
+          <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving">
+            {{ saving ? 'Сохранение…' : 'Сохранить' }}
+          </button>
+        </div>
+      </div>
+      <div class="roles-form">
+        <label class="roles-field">
+          <span>Название</span>
+          <input
+            class="admin-input"
+            [value]="formTitle"
+            (input)="onFormTitle($any($event.target).value)"
+            placeholder="Например: Партнёр"
+          />
+        </label>
+        <label class="roles-field">
+          <span>Код (латиница)</span>
+          <input
+            class="admin-input"
+            [value]="formCode"
+            (input)="onFormCode($any($event.target).value)"
+            placeholder="partner"
+            [disabled]="codeLocked"
+          />
+        </label>
+        <label class="roles-field roles-field--sort">
+          <span>Порядок</span>
+          <input
+            class="admin-input"
+            type="number"
+            [value]="formSort"
+            (input)="onFormSort($any($event.target).value)"
+          />
+        </label>
+      </div>
+      @if (saveError) {
+        <p class="admin-error">{{ saveError }}</p>
+      }
+    </div>
+  } @else {
+    @if (error) {
+      <p class="admin-error">{{ error }}</p>
+    }
+
+    @if (loading) {
+      <p class="text-muted">Загрузка…</p>
+    } @else {
+      <div class="roles-card">
+        <div class="roles-list">
+          @for (role of roles; track role.id) {
+            <div class="role-row">
+              <div class="role-row__main">
+                <strong>{{ role.title }}</strong>
+                <span class="role-row__code">{{ role.code }}</span>
+              </div>
+              @if (isSystem(role)) {
+                <span class="role-row__badge">системная</span>
+              }
+              <span class="role-row__order" title="Порядок">{{ role.sort_order }}</span>
+              <div class="role-row__tools">
+                <button type="button" class="btn-icon" title="Изменить" (click)="startEdit(role)">✎</button>
+                @if (!isSystem(role)) {
+                  <button type="button" class="btn-icon btn-icon--danger" title="Удалить" (click)="remove(role)">✕</button>
+                }
+              </div>
+            </div>
+          } @empty {
+            <p class="text-muted">Ролей нет. Добавьте первую роль.</p>
+          }
+        </div>
+      </div>
+    }
+  }
+</section>

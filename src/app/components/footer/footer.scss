@@ -27,6 +27,21 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+.footer__logo-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.footer__logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
 .footer__logo-mark {
   display: grid;
   place-items: center;
@@ -41,6 +56,16 @@
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.85rem;
   max-width: 260px;
+}
+
+/* Строки логотипа: «крупнее» и «отступ сверху» включаются по строке */
+.footer__logo-row--large {
+  font-size: 1.08rem !important;
+  font-weight: 600;
+}
+
+.footer__logo-row--gap {
+  margin-top: 0.6rem;
 }
 
 .footer h3 {
@@ -68,14 +93,38 @@
   text-decoration: underline;
 }
 
-.footer__phone {
-  font-size: 1.1rem !important;
+/* Ссылки в колонках: «крупнее» и «отступ сверху» включаются по строке */
+.footer__col a.footer__link--large {
+  font-size: 1.08rem;
   font-weight: 600;
+}
+
+.footer__col a.footer__link--gap {
+  margin-top: 0.6rem;
 }
 
 .footer__work {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.85rem;
+}
+
+/* Строки контактов — единый стиль независимо от тега (a/p/…): margin и размер по умолчанию одинаковые */
+.footer__contact {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.footer__contact--large {
+  font-size: 1.08rem !important;
+  font-weight: 600;
+}
+
+.footer__contact--gap {
+  margin-top: 0.6rem;
 }
 
 .footer__bottom {
@@ -92,6 +141,11 @@
 .footer__bottom a {
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
+}
+
+.footer__bottom span.footer__copyright--large {
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .footer__bottom a:hover {

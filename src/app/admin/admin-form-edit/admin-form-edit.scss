@@ -1,0 +1,248 @@
+.admin-error {
+  color: var(--color-danger);
+}
+
+.admin-saved {
+  color: var(--color-success);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.admin-section__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.form-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Строки «подпись слева + поле на всю ширину», как на страницах настроек */
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.6rem 0.85rem;
+}
+
+.form-row__label {
+  flex: 0 0 170px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #50575e;
+}
+
+.form-row .admin-input,
+.form-row .admin-textarea {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-row--area {
+  align-items: flex-start;
+}
+
+.form-row--area .form-row__label {
+  padding-top: 0.55rem;
+}
+
+/* Строки внутри карточки поля — без собственной рамки */
+.form-row--plain {
+  background: transparent;
+  border: 0;
+  padding: 0.3rem 0;
+}
+
+.admin-input,
+.admin-textarea {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.admin-input:focus,
+.admin-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.form-editor__fields-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.form-editor__fields-head h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-field {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-bg);
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.form-field__toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-field__type {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+}
+
+.form-field__actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btn-icon {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.btn-icon:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn-icon--danger:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.form-field__required {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Отправки */
+.submissions {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 760px;
+}
+
+.submissions h3 {
+  margin: 0 0 1rem;
+  font-size: 1.05rem;
+}
+
+.submissions__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.submission {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.submission__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.submission__page {
+  font-size: 0.75rem;
+}
+
+.submission__body {
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.submission__row {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.submission__key {
+  font-weight: 600;
+  min-width: 120px;
+  color: var(--color-muted);
+}
+
+.submission__value {
+  word-break: break-word;
+}
+
+.form-editor__lead {
+  margin-top: 0.25rem;
+  padding: 0.6rem 0.75rem;
+  background: #f0f6fc;
+  border: 1px solid #c5d9ed;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #1d2327;
+}
+
+@media (max-width: 700px) {
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+  }
+
+  .form-row__label {
+    flex: none;
+  }
+}

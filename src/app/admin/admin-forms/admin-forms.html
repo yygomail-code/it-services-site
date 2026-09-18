@@ -1,0 +1,39 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div>
+      <h1>Формы</h1>
+      <p class="text-muted">
+        Формы для страниц сайта. Вставьте форму на страницу в редакторе, указав её номер или название.
+      </p>
+    </div>
+    <a routerLink="/admin/forms/new" class="btn btn--primary">+ Новая форма</a>
+  </div>
+
+  @if (error) {
+    <p class="admin-error">{{ error }}</p>
+  }
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else if (forms.length === 0) {
+    <p class="text-muted">Форм пока нет. Нажмите «+ Новая форма».</p>
+  } @else {
+    <div class="forms-list">
+      @for (form of forms; track trackForm($index, form)) {
+        <div class="form-item">
+          <div class="form-item__main">
+            <a class="form-item__title" [routerLink]="['/admin/forms', form.id]">{{ form.title }}</a>
+            <code class="form-item__num">#{{ form.form_number }}</code>
+            <span class="form-item__meta">
+              Поля: {{ form.fields_count }} · Отправок: {{ form.submissions_count }}
+            </span>
+          </div>
+          <div class="form-item__actions">
+            <a routerLink="/admin/forms/{{ form.id }}" class="btn btn--small">Редактировать</a>
+            <button type="button" class="btn btn--small btn--danger" (click)="remove(form)">Удалить</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>

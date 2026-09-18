@@ -1,0 +1,140 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div>
+      <h1>Медиатека</h1>
+      <p class="text-muted">Изображения для страниц: загружайте, редактируйте названия и описания</p>
+    </div>
+    <label class="btn btn--primary media-upload">
+      {{ uploading ? 'Загрузка…' : '+ Загрузить' }}
+      <input type="file" accept="image/*" multiple (change)="onFileSelected($event)" [disabled]="uploading" />
+    </label>
+  </div>
+
+  @if (error) {
+    <p class="admin-error">{{ error }}</p>
+  }
+  @if (uploadError) {
+    <p class="admin-error">{{ uploadError }}</p>
+  }
+
+  <div
+    class="media-dropzone"
+    [class.media-dropzone--over]="dragOver"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    @if (dragOver) {
+      <div class="media-dropzone__hint">Отпустите файлы, чтобы загрузить</div>
+    } @else if (media.length === 0 && !loading) {
+      <div class="media-dropzone__empty">
+        <p>Перетащите изображения сюда или нажмите «+ Загрузить»</p>
+        <p class="media-dropzone__sub">JPG, PNG, GIF, WebP, SVG, AVIF до 10 МБ</p>
+      </div>
+    }
+  </div>
+
+  @if (media.length > 0) {
+    <div class="media-toolbar">
+      <input
+        class="admin-input media-search"
+        type="search"
+        placeholder="Поиск по имени, названию, alt…"
+        [value]="search"
+        (input)="onSearch($any($event.target).value)"
+      />
+      <span class="media-count">{{ filtered.length }} из {{ media.length }}</span>
+    </div>
+  }
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else if (media.length > 0) {
+    @if (filtered.length === 0) {
+      <p class="text-muted">Ничего не найдено по запросу «{{ search }}».</p>
+    } @else {
+      <div class="media-grid">
+        @for (item of filtered; track trackItem($index, item)) {
+          <button type="button" class="media-card" (click)="openDetails(item)">
+            <span class="media-card__img-wrap">
+              @if (isImage(item)) {
+                <img class="media-card__img" [src]="item.url" [alt]="item.alt || item.title || item.file_name" loading="lazy" />
+              } @else {
+                <span class="media-card__img media-card__img--file">Файл</span>
+              }
+            </span>
+            <span class="media-card__info">
+              <span class="media-card__name" [title]="item.title || item.file_name">{{ item.title || item.file_name }}</span>
+              <span class="media-card__meta">{{ formatSize(item.size) }}@if (dimensions(item)) { · {{ dimensions(item) }} }</span>
+            </span>
+          </button>
+        }
+      </div>
+    }
+  }
+</section>
+
+@if (selected) {
+  <div class="media-modal" (click)="closeDetails()">
+    <div class="media-modal__dialog" (click)="$event.stopPropagation()">
+      <div class="media-modal__head">
+        <h2>{{ selected.title || selected.file_name }}</h2>
+        <div class="media-modal__actions">
+          @if (savedFlag) {
+            <span class="media-saved">✓ Сохранено</span>
+          }
+          <button type="button" class="btn btn--outline" (click)="copyUrl(selected)">Копировать URL</button>
+          <button type="button" class="btn btn--danger" (click)="remove(selected)">Удалить</button>
+          <button type="button" class="btn btn--primary" (click)="saveDetails()" [disabled]="saving">
+            {{ saving ? 'Сохранение…' : 'Сохранить' }}
+          </button>
+        </div>
+        <button type="button" class="media-modal__close" title="Закрыть" (click)="closeDetails()">✕</button>
+      </div>
+
+      <div class="media-modal__body">
+        <div class="media-modal__top">
+          <div class="media-modal__preview">
+            @if (isImage(selected)) {
+              <img [src]="selected.url" [alt]="selected.alt || selected.file_name" />
+            } @else {
+              <div class="media-modal__file">Файл</div>
+            }
+          </div>
+
+          <div class="media-modal__props">
+            <span>Файл:</span> <code>{{ selected.file_name }}</code>
+            <span>Размер:</span> <span>{{ formatSize(selected.size) }}</span>
+            @if (dimensions(selected)) {
+              <span>Размеры:</span> <span>{{ dimensions(selected) }}</span>
+            }
+            <span>Загружено:</span> <span>{{ formatDate(selected.created_at) }}</span>
+            <span>Добавил:</span> <span>{{ uploaderText(selected) }}</span>
+            <span>Используется:</span> <span>{{ usageText(selected) }}</span>
+            <span>URL:</span>
+            <code class="media-modal__url">{{ selected.url }}</code>
+          </div>
+        </div>
+
+        <div class="media-modal__fields">
+          @if (saveError) {
+            <p class="admin-error">{{ saveError }}</p>
+          }
+
+          <label class="media-field">
+            <span class="media-field__label">Название</span>
+            <input class="admin-input" [value]="editTitle" (input)="onEditTitle($any($event.target).value)" placeholder="Название файла" />
+          </label>
+          <label class="media-field">
+            <span class="media-field__label">Альтернативный текст (alt)</span>
+            <input class="admin-input" [value]="editAlt" (input)="onEditAlt($any($event.target).value)" placeholder="Для SEO и доступности" />
+          </label>
+          <label class="media-field media-field--area">
+            <span class="media-field__label">Описание</span>
+            <textarea class="admin-textarea" [value]="editDescription" (input)="onEditDescription($any($event.target).value)" rows="3" placeholder="Описание файла"></textarea>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+}

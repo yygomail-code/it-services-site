@@ -136,21 +136,29 @@ function startSession(): void
     session_start();
 }
 
-function currentUser(): ?array
-{
-    startSession();
-    if (empty($_SESSION['user_id'])) {
-        return null;
+    function currentUser(): ?array
+    {
+        startSession();
+        if (empty($_SESSION['user_id'])) {
+            return null;
+        }
+        try {
+            $stmt = db()->prepare(
+                'SELECT u.id, u.login, u.email, u.role, u.full_name,
+                        u.last_name, u.first_name, u.middle_name, u.birth_date, u.country, u.region, u.city,
+                        u.address, u.phone, u.max_link, u.telegram, u.whatsapp, u.site, u.avatar_media_id,
+                        m.url AS avatar_url
+                 FROM users u
+                 LEFT JOIN media m ON m.id = u.avatar_media_id
+                 WHERE u.id = ? AND u.active = 1'
+            );
+            $stmt->execute([(int) $_SESSION['user_id']]);
+            $user = $stmt->fetch();
+            return $user ?: null;
+        } catch (Throwable) {
+            return null;
+        }
     }
-    try {
-        $stmt = db()->prepare('SELECT id, login, email, role, full_name FROM users WHERE id = ? AND active = 1');
-        $stmt->execute([(int) $_SESSION['user_id']]);
-        $user = $stmt->fetch();
-        return $user ?: null;
-    } catch (Throwable) {
-        return null;
-    }
-}
 
 function requireAuth(): array
 {
@@ -161,14 +169,23 @@ function requireAuth(): array
     return $user;
 }
 
-function requireRole(array $roles): array
-{
-    $user = requireAuth();
-    if (!in_array($user['role'], $roles, true)) {
-        respondError(403, 'Недостаточно прав');
+    function requireRole(array $roles): array
+    {
+        $user = requireAuth();
+        if (!in_array($user['role'], $roles, true)) {
+            respondError(403, 'Недостаточно прав');
+        }
+        // Письма не теряются: раз в 5 минут подчищаем очередь после ответа клиенту
+        static $queueHookRegistered = false;
+        if (!$queueHookRegistered) {
+            $queueHookRegistered = true;
+            require_once __DIR__ . '/email_queue.php';
+            register_shutdown_function(static function (): void {
+                emailQueueMaybeProcess();
+            });
+        }
+        return $user;
     }
-    return $user;
-}
 
 // ---------------------------------------------------------------------
 // CSRF

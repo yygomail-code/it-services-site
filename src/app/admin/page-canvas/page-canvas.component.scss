@@ -1,0 +1,343 @@
+.canvas {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+/* Секция: чип с настройками в углу */
+.pc-section {
+  position: relative;
+}
+
+.canvas-section-bar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: #1d2327;
+  color: #e5e7eb;
+  font-size: 0.72rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s;
+}
+
+.pc-section:hover > .canvas-section-bar,
+.canvas-section--selected > .canvas-section-bar {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.canvas-section-bar__grip {
+  cursor: grab;
+  color: #98a2b3;
+}
+
+.canvas-section-bar__grip:active {
+  cursor: grabbing;
+}
+
+.canvas-section-bar__label {
+  white-space: nowrap;
+}
+
+.canvas-section-bar__actions {
+  display: flex;
+  gap: 2px;
+}
+
+.canvas-bar-btn {
+  border: 0;
+  background: transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+  font-size: 0.8rem;
+  line-height: 1;
+  padding: 3px 5px;
+  border-radius: 5px;
+}
+
+.canvas-bar-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.canvas-bar-btn--danger:hover {
+  background: rgba(220, 38, 38, 0.35);
+}
+
+/* Колонки */
+.canvas-col {
+  position: relative;
+  min-height: 48px;
+  border-radius: 6px;
+}
+
+.canvas-col--drop {
+  outline: 2px dashed rgba(24, 119, 242, 0.5);
+  outline-offset: 4px;
+}
+
+/* Ручка изменения ширины колонок (между соседними колонками) */
+.canvas-col__resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -11px;
+  width: 22px;
+  z-index: 6;
+  cursor: col-resize;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.canvas-col__resizer::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: rgba(24, 119, 242, 0.35);
+}
+
+.pc-section:hover .canvas-col__resizer,
+.canvas-col__resizer--active {
+  opacity: 1;
+}
+
+.canvas-col__resizer:hover::after,
+.canvas-col__resizer--active::after {
+  background: rgba(24, 119, 242, 0.75);
+}
+
+/* Поля соотношения колонок */
+.canvas-widths {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.canvas-widths__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  min-width: 110px;
+}
+
+.canvas-widths__item .admin-input {
+  width: 100%;
+}
+
+.canvas-col__empty {
+  padding: 1rem;
+  border: 1px dashed #c9ced6;
+  border-radius: 8px;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* Кнопка «+» в колонке: поверх контента, не влияет на высоту колонки */
+.canvas-col__plus {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.9);
+  color: #98a2b3;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 3px 9px;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.canvas-col:hover > .canvas-col__plus {
+  opacity: 1;
+}
+
+.canvas-col__plus:hover {
+  background: #eef0f3;
+  color: #1d2327;
+}
+
+/* Индикаторы перетаскивания у блоков */
+app-canvas-block {
+  display: block;
+  position: relative;
+}
+
+/* Блоки вне секций на сайте живут в обычной секции (inner 820px + боковые отступы).
+   Повторяем это в канвасе, чтобы ширина и отступы совпадали с сайтом. */
+.canvas > app-canvas-block {
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+/* Группа обычных блоков = обычная секция на сайте: отступы 2rem сверху и снизу */
+.canvas > app-canvas-block.canvas-block--run-start {
+  padding-top: 2rem;
+}
+
+.canvas > app-canvas-block.canvas-block--run-end {
+  padding-bottom: 2rem;
+}
+
+app-canvas-block.canvas-drop-before::before,
+app-canvas-block.canvas-drop-after::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-primary);
+  z-index: 10;
+}
+
+app-canvas-block.canvas-drop-before::before {
+  top: -4px;
+}
+
+app-canvas-block.canvas-drop-after::after {
+  bottom: -4px;
+}
+
+/* Хвост потока и пустая страница */
+.canvas-tail {
+  height: 36px;
+  border-radius: 6px;
+}
+
+.canvas-tail--active {
+  border: 2px dashed rgba(24, 119, 242, 0.4);
+}
+
+.canvas-empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  border: 1px dashed #c9ced6;
+  border-radius: 10px;
+}
+
+/* Меню вставки */
+.canvas-insert {
+  position: fixed;
+  z-index: 60;
+  width: 230px;
+  max-height: 62vh;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.2);
+  padding: 6px;
+}
+
+.canvas-insert__title {
+  font-size: 0.72rem;
+  color: var(--color-muted);
+  padding: 4px 8px 6px;
+}
+
+.canvas-insert__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  color: #1d2327;
+}
+
+.canvas-insert__item:hover {
+  background: #f0f2f5;
+}
+
+.canvas-insert__icon {
+  width: 18px;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+/* Поповер настроек секции */
+.canvas-section-pop {
+  position: absolute;
+  top: 44px;
+  right: 8px;
+  z-index: 30;
+  width: 264px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+  padding: 0.75rem 0.85rem;
+}
+
+.canvas-pop__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.canvas-pop__close {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.canvas-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
+.canvas-cols-row {
+  display: flex;
+  gap: 4px;
+}
+
+.canvas-col-btn {
+  width: 30px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.canvas-col-btn--active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+}

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -13,6 +13,7 @@ export class LoginComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   form!: FormGroup;
   error = '';
@@ -59,6 +60,12 @@ export class LoginComponent implements OnInit {
   }
 
   private redirect(role: string): void {
+    // Возврат на страницу, с которой пришли (например, закрытая по ролям)
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (returnUrl && returnUrl.startsWith('/')) {
+      this.router.navigateByUrl(returnUrl);
+      return;
+    }
     if (role === 'manager' || role === 'admin') {
       this.router.navigate(['/admin/leads']);
     } else {

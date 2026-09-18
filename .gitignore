@@ -47,3 +47,6 @@ Thumbs.db
 .env
 .env.local
 *.env
+
+# Пользовательские загрузки (не в репозиторий)
+uploads/

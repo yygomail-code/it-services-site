@@ -1,0 +1,149 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div>
+      <h1>{{ formId ? 'Редактирование формы' : 'Новая форма' }}</h1>
+      <p class="text-muted">
+        Вставьте форму на страницу в редакторе страницы — кнопка «+ Форма», укажите её номер.
+      </p>
+    </div>
+    <div class="admin-section__actions">
+      @if (saved) {
+        <span class="admin-saved">✓ Сохранено</span>
+      }
+      @if (formId) {
+        <button type="button" class="btn btn--outline" (click)="toggleSubmissions()">
+          {{ showSubmissions ? '← К форме' : 'Отправки' }}
+        </button>
+      }
+      <a routerLink="/admin/forms" class="btn btn--outline">← К списку</a>
+      @if (!showSubmissions) {
+        <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving">
+          {{ saving ? 'Сохранение…' : 'Сохранить' }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else {
+    @if (error) {
+      <p class="admin-error">{{ error }}</p>
+    }
+
+    @if (showSubmissions) {
+      <div class="submissions">
+        <h3>Отправки формы</h3>
+        @if (submissionsLoading) {
+          <p class="text-muted">Загрузка…</p>
+        } @else if (submissions.length === 0) {
+          <p class="text-muted">Отправок пока нет.</p>
+        } @else {
+          <div class="submissions__list">
+            @for (sub of submissions; track sub.id) {
+              <div class="submission">
+                <div class="submission__head">
+                  <span class="submission__date">{{ formatDate(sub.created_at) }}</span>
+                  @if (sub.page) {
+                    <code class="submission__page">{{ sub.page }}</code>
+                  }
+                </div>
+                <div class="submission__body">
+                  @for (key of submissionKeys(sub); track key) {
+                    <div class="submission__row">
+                      <span class="submission__key">{{ key }}</span>
+                      <span class="submission__value">{{ sub.data[key] }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="form-editor">
+        <label class="form-row">
+          <span class="form-row__label">Название формы *</span>
+          <input class="admin-input" [(ngModel)]="title" placeholder="Например: Заявка на консультацию" />
+        </label>
+        <label class="form-row">
+          <span class="form-row__label">Текст кнопки</span>
+          <input class="admin-input" [(ngModel)]="submitLabel" placeholder="Отправить" />
+        </label>
+        <label class="form-row form-row--area">
+          <span class="form-row__label">Описание (под заголовком)</span>
+          <textarea class="admin-textarea" [(ngModel)]="description" rows="2" placeholder="Необязательно"></textarea>
+        </label>
+        <label class="form-row">
+          <span class="form-row__label">Сообщение после отправки</span>
+          <input class="admin-input" [(ngModel)]="successMessage" placeholder="Спасибо! Заявка отправлена." />
+        </label>
+
+        <label class="form-field__required form-editor__lead">
+          <input type="checkbox" [(ngModel)]="createLead" />
+          Создавать лид в разделе «Лиды» (заявка попадёт менеджеру)
+        </label>
+
+        <div class="form-editor__fields-head">
+          <h3>Поля формы</h3>
+          <button type="button" class="btn btn--small" (click)="addField()">+ Добавить поле</button>
+        </div>
+
+        @if (fields.length === 0) {
+          <p class="text-muted">Полей пока нет. Добавьте первое поле.</p>
+        }
+
+        <div class="form-fields">
+          @for (field of fields; track trackField($index); let idx = $index) {
+            <div class="form-field">
+              <div class="form-field__toolbar">
+                <span class="form-field__type">
+                  {{ typeLabel(field.field_type) }}
+                </span>
+                <div class="form-field__actions">
+                  <button type="button" class="btn-icon" title="Вверх" (click)="moveField(idx, -1)">↑</button>
+                  <button type="button" class="btn-icon" title="Вниз" (click)="moveField(idx, 1)">↓</button>
+                  <button type="button" class="btn-icon btn-icon--danger" title="Удалить" (click)="removeField(idx)">✕</button>
+                </div>
+              </div>
+
+              <label class="form-row form-row--plain">
+                <span class="form-row__label">Тип</span>
+                <select class="admin-input" [value]="field.field_type" (change)="onFieldChange(idx, field, 'field_type', $any($event.target).value)">
+                  @for (t of fieldTypes; track t.value) {
+                    <option [value]="t.value">{{ t.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="form-row form-row--plain">
+                <span class="form-row__label">Название (label) *</span>
+                <input class="admin-input" [value]="field.label" placeholder="Ваше имя" (input)="onFieldChange(idx, field, 'label', $any($event.target).value)" />
+              </label>
+              <label class="form-row form-row--plain">
+                <span class="form-row__label">Имя поля (name) *</span>
+                <input class="admin-input" [value]="field.name" placeholder="name" (input)="onFieldChange(idx, field, 'name', $any($event.target).value)" />
+              </label>
+              <label class="form-row form-row--plain">
+                <span class="form-row__label">Подсказка (placeholder)</span>
+                <input class="admin-input" [value]="field.placeholder" placeholder="Необязательно" (input)="onFieldChange(idx, field, 'placeholder', $any($event.target).value)" />
+              </label>
+
+              @if (field.field_type === 'select') {
+                <label class="form-row form-row--plain form-row--area">
+                  <span class="form-row__label">Варианты (каждый с новой строки)</span>
+                  <textarea class="admin-textarea" [value]="field.optionsText" rows="3" placeholder="Вариант 1&#10;Вариант 2" (input)="onFieldChange(idx, field, 'optionsText', $any($event.target).value)"></textarea>
+                </label>
+              }
+
+              <label class="form-field__required">
+                <input type="checkbox" [checked]="field.required" (change)="onFieldChange(idx, field, 'required', $any($event.target).checked)" />
+                Обязательное поле
+              </label>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</section>

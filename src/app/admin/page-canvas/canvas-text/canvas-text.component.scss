@@ -1,0 +1,80 @@
+/* Хост — блок: иначе inline-элемент добавляет лишнюю строку (высота блока больше,
+   чем на сайте) и мешает схлопыванию отступов */
+:host {
+  display: block;
+}
+
+.canvas-text {
+  position: relative;
+}
+
+/* В rem, а не em: иначе для заголовков (крупный шрифт) минимальная высота
+   раздувала блок сильнее, чем на сайте */
+.canvas-text__host {
+  min-height: 1.7rem;
+}
+
+.canvas-text__area {
+  outline: none;
+}
+
+/* Подсказка в пустом блоке — правило в src/styles/site-content.scss
+   (инкапсуляция компонента не видит динамические элементы TipTap) */
+
+/* Плавающий тулбар */
+.canvas-text__bubble {
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 4px;
+  background: #1d2327;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3);
+  white-space: nowrap;
+}
+
+.canvas-text__btn {
+  border: 0;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 0.78rem;
+  font-family: inherit;
+  line-height: 1;
+  padding: 6px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.canvas-text__btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.canvas-text__btn--active {
+  background: rgba(255, 255, 255, 0.24);
+  color: #fff;
+}
+
+.canvas-text__sep {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 3px;
+}
+
+.canvas-text__link {
+  border: 0;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 0.78rem;
+  padding: 6px 8px;
+  border-radius: 6px;
+  width: 220px;
+  outline: none;
+}
+
+.canvas-text__btn--ok {
+  font-weight: 600;
+}

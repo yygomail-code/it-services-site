@@ -1,0 +1,40 @@
+.link-editor {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.link-editor .admin-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.link-editor__select {
+  flex: 0 0 auto;
+  max-width: 240px;
+}
+
+.link-editor--invalid .admin-input {
+  border-color: #d63638;
+}
+
+.link-editor__error {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 0.75rem;
+  color: #d63638;
+}
+
+@media (max-width: 900px) {
+  .link-editor .admin-input {
+    flex: 1 1 45%;
+  }
+
+  .link-editor__select {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+}

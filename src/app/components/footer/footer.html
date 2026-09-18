@@ -3,46 +3,84 @@
     <div class="footer__grid">
       <div class="footer__col">
         <div class="footer__logo">
-          <span class="footer__logo-mark">Л</span>
-          <span>Литвинов Антон<br /><small>ИТ-услуги: сайты, CRM, БД, автоматизация</small></span>
+          @if (brandLogo) {
+            <img class="footer__logo-img" [src]="brandLogo" [alt]="brandName" />
+          } @else {
+            <span class="footer__logo-mark">{{ brandMark }}</span>
+          }
+          @if (brandName || aboutSubtitle) {
+            <span class="footer__logo-text">
+              @if (brandName) {
+                <span class="footer__logo-title">{{ brandName }}</span>
+              }
+              @if (aboutSubtitle) {
+                <small
+                  [class.footer__logo-row--large]="aboutRowLarge('subtitle')"
+                  [class.footer__logo-row--gap]="aboutRowGap('subtitle')"
+                >{{ aboutSubtitle }}</small>
+              }
+            </span>
+          }
         </div>
-        <p class="footer__note">Работаю удалённо по всей России, возможен выезд к заказчику.</p>
+        @if (aboutNote) {
+          <p
+            class="footer__note"
+            [class.footer__logo-row--large]="aboutRowLarge('note')"
+            [class.footer__logo-row--gap]="aboutRowGap('note')"
+          >{{ aboutNote }}</p>
+        }
       </div>
 
-      <nav class="footer__col" aria-label="Навигация по услугам">
-        <h3>Услуги</h3>
-        <a routerLink="/services/website-development">Разработка сайтов</a>
-        <a routerLink="/services/website-support">Поддержка сайтов</a>
-        <a routerLink="/services/crm-systems">CRM-системы</a>
-        <a routerLink="/services/databases">Базы данных</a>
-        <a routerLink="/services/corporate-software">Корпоративный софт</a>
-        <a routerLink="/services/ai-integration">Интеграция AI</a>
-      </nav>
+      @for (col of visibleColumns; track col.title; let ci = $index) {
+        <nav class="footer__col" [attr.aria-label]="col.title || ('Колонка ' + (ci + 1))">
+          <h3>{{ col.title }}</h3>
+          @for (link of col.links; track link.label) {
+            <a
+              [routerLink]="isExternal(link.url) ? null : link.url"
+              [attr.href]="isExternal(link.url) ? link.url : null"
+              [attr.target]="isExternal(link.url) ? '_blank' : null"
+              [attr.rel]="isExternal(link.url) ? 'noopener' : null"
+              [class]="linkClasses(link)"
+            >{{ link.label }}</a>
+          }
+        </nav>
+      }
 
-      <nav class="footer__col" aria-label="Навигация по сайту">
-        <h3>Разделы</h3>
-        <a routerLink="/">Главная</a>
-        <a routerLink="/services">Все услуги</a>
-        <a routerLink="/portfolio">Портфолио</a>
-        <a routerLink="/about">Обо мне</a>
-        <a routerLink="/partners">Сотрудничество</a>
-        <a routerLink="/contacts">Контакты</a>
-      </nav>
-
-      <div class="footer__col">
-        <h3>Контакты</h3>
-        <a class="footer__phone" [href]="phoneHref">{{ phone }}</a>
-        <a [href]="'mailto:' + email">{{ email }}</a>
-        <p class="footer__work">{{ city }} · Ежедневно с 9:00 до 21:00 (МСК)</p>
-      </div>
+      @if (contactRows.length) {
+        <div class="footer__col">
+          <h3>Контакты</h3>
+          @for (row of contactRows; track row.field) {
+            <a
+              class="footer__contact"
+              [class.footer__contact--large]="row.large"
+              [class.footer__contact--gap]="row.gap"
+              [class.footer__work]="!row.href"
+              [attr.href]="row.href"
+            >
+              <app-contact-icon [field]="row.field" [style.display]="row.icon ? null : 'none'" />
+              {{ row.value }}
+            </a>
+          }
+        </div>
+      }
     </div>
 
     <div class="footer__bottom">
-      <span>© 2026 Литвинов Антон. Все права защищены.</span>
-      <div class="footer__links">
-        <a routerLink="/policy">Политика конфиденциальности</a>
-        <a routerLink="/terms">Пользовательское соглашение</a>
-      </div>
+      @if (showCopyright) {
+        <span [class.footer__copyright--large]="copyrightLarge">{{ copyrightText }}</span>
+      }
+      @if (bottomLinks.length) {
+        <div class="footer__links">
+          @for (link of bottomLinks; track link.label) {
+            <a
+              [routerLink]="isExternal(link.url) ? null : link.url"
+              [attr.href]="isExternal(link.url) ? link.url : null"
+              [attr.target]="isExternal(link.url) ? '_blank' : null"
+              [attr.rel]="isExternal(link.url) ? 'noopener' : null"
+            >{{ link.label }}</a>
+          }
+        </div>
+      }
     </div>
   </div>
 </footer>

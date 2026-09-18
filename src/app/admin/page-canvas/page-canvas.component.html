@@ -1,0 +1,217 @@
+<div class="canvas">
+  @for (item of items; track item.uid) {
+    @if (item.kind === 'section') {
+      <section
+        class="pc-section"
+        [class.pc-section--light]="item.background === 'light'"
+        [class.pc-section--dark]="item.background === 'dark'"
+        [class.pc-section--accent]="item.background === 'accent'"
+        [class.pc-section--hero]="item.background === 'hero'"
+      >
+        <div class="canvas-section-bar">
+          <span
+            class="canvas-section-bar__grip"
+            draggable="true"
+            title="Перетащить секцию"
+            (dragstart)="onSectionDragStart($event, item.uid)"
+          >⠿</span>
+          <span class="canvas-section-bar__label">
+            Секция · {{ item.cols.length }} кол. · фон: {{ bgLabel(item.background) }}
+          </span>
+          <div class="canvas-section-bar__actions">
+            <button type="button" class="canvas-bar-btn" title="Настройки секции" (click)="toggleSectionSettings(item.uid)">⚙</button>
+            <button type="button" class="canvas-bar-btn" title="Дублировать секцию" (click)="duplicateSection(item.uid)">⧉</button>
+            <button type="button" class="canvas-bar-btn canvas-bar-btn--danger" title="Удалить секцию" (click)="removeSection(item.uid)">✕</button>
+          </div>
+        </div>
+
+        <div
+          class="pc-section__inner"
+          [class.pc-section__inner--gap-none]="item.gap === 'none'"
+          [class.pc-section__inner--gap-small]="item.gap === 'small'"
+          [class.pc-section__inner--gap-large]="item.gap === 'large'"
+        >
+          <div
+            class="pc-grid"
+            [class.pc-grid--align-middle]="item.align === 'middle'"
+            [class.pc-grid--align-bottom]="item.align === 'bottom'"
+            [style.--pc-cols]="item.cols.length"
+            [style.--pc-widths]="widthsCss(item)"
+          >
+            @for (col of item.cols; track $index; let ci = $index) {
+              <div
+                class="pc-col canvas-col"
+                [class.canvas-col--drop]="dropTarget?.kind === 'col' && dropTarget?.sectionUid === item.uid && dropTarget?.colIdx === ci"
+                (dragover)="onColDragOver($event, item.uid, ci)"
+                (drop)="onDrop($event)"
+              >
+                @for (fb of col; track fb.uid) {
+                  <app-canvas-block
+                    [block]="fb"
+                    [forms]="forms"
+                    [selected]="isSelected(fb.uid)"
+                    [autofocus]="isFocusTarget(fb.uid)"
+                    [class.canvas-drop-before]="dropTarget?.kind === 'block-before' && dropTarget?.uid === fb.uid"
+                    [class.canvas-drop-after]="dropTarget?.kind === 'block-after' && dropTarget?.uid === fb.uid"
+                    (click)="select(fb.uid)"
+                    (focusin)="select(fb.uid)"
+                    (dragstart)="onBlockDragStart($event, fb.uid)"
+                    (dragover)="onBlockDragOver($event, fb.uid, item.uid, ci)"
+                    (drop)="onDrop($event)"
+                    (dragend)="onDragEnd()"
+                    (change)="onBlockChange()"
+                    (remove)="removeBlock(fb.uid)"
+                    (duplicate)="duplicateBlock(fb.uid)"
+                    (plusClick)="onPlus(fb.uid, $event)"
+                    (newBlockAfter)="newBlockAfter(fb.uid)"
+                    (removeEmpty)="removeEmptyBlock(fb.uid)"
+                    (slash)="onSlash(fb.uid, $event)"
+                  />
+                }
+                @if (col.length === 0) {
+                  <div class="canvas-col__empty">Пустая колонка — перетащите блок сюда</div>
+                }
+                <button type="button" class="canvas-col__plus" title="Добавить блок в колонку" (click)="openInsertForColumn(item.uid, ci, $event)">+</button>
+                @if (ci < item.cols.length - 1) {
+                  <div
+                    class="canvas-col__resizer"
+                    [class.canvas-col__resizer--active]="resizeState?.sectionUid === item.uid && resizeState?.colIdx === ci"
+                    title="Потяните, чтобы изменить ширину колонок"
+                    (mousedown)="startColResize($event, item.uid, ci)"
+                  ></div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (sectionSettingsUid === item.uid) {
+          <div class="canvas-section-pop" (click)="$event.stopPropagation()">
+            <div class="canvas-pop__head">
+              <span>Настройки секции</span>
+              <button type="button" class="canvas-pop__close" title="Закрыть" (click)="toggleSectionSettings(item.uid)">✕</button>
+            </div>
+            <label class="canvas-field">
+              <span>Фон</span>
+              <select class="admin-input" [value]="item.background" (change)="setSectionBg(item.uid, $any($event.target).value)">
+                <option value="default">Обычный</option>
+                <option value="light">Светлый</option>
+                <option value="dark">Тёмный</option>
+                <option value="accent">Акцент</option>
+                <option value="hero">Градиент (как hero)</option>
+              </select>
+            </label>
+            <label class="canvas-field">
+              <span>Отступы</span>
+              <select class="admin-input" [value]="item.gap" (change)="setSectionGap(item.uid, $any($event.target).value)">
+                <option value="normal">Обычные</option>
+                <option value="none">Без отступов</option>
+                <option value="small">Малые</option>
+                <option value="large">Большие</option>
+              </select>
+            </label>
+            <label class="canvas-field">
+              <span>Выравнивание колонок</span>
+              <select class="admin-input" [value]="item.align" (change)="setSectionAlign(item.uid, $any($event.target).value)">
+                <option value="top">По верху</option>
+                <option value="middle">По центру</option>
+                <option value="bottom">По низу</option>
+              </select>
+            </label>
+            <div class="canvas-field">
+              <span>Колонки</span>
+              <div class="canvas-cols-row">
+                @for (n of [1, 2, 3, 4]; track n) {
+                  <button
+                    type="button"
+                    class="canvas-col-btn"
+                    [class.canvas-col-btn--active]="item.cols.length === n"
+                    (click)="setSectionColumns(item.uid, n)"
+                  >{{ n }}</button>
+                }
+              </div>
+            </div>
+            @if (item.cols.length > 1) {
+              <div class="canvas-field">
+                <span>Соотношение колонок</span>
+                <div class="canvas-widths">
+                  @for (col of item.cols; track $index; let ci = $index) {
+                    <label class="canvas-widths__item">
+                      <span>Колонка {{ ci + 1 }} — {{ widthPercent(item, ci) }}%</span>
+                      <input
+                        type="number"
+                        class="admin-input"
+                        min="1"
+                        max="100"
+                        [value]="widthAt(item, ci)"
+                        (change)="setSectionWidth(item.uid, ci, $any($event.target).value)"
+                      />
+                    </label>
+                  }
+                </div>
+                <button type="button" class="btn btn--small" (click)="equalizeWidths(item.uid)">Сделать равными</button>
+                <p class="canvas-hint">
+                  Вес колонки (1–100). Границу между колонками можно перетаскивать прямо на канвасе.
+                </p>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    } @else {
+      <app-canvas-block
+        [block]="item"
+        [forms]="forms"
+        [selected]="isSelected(item.uid)"
+        [autofocus]="isFocusTarget(item.uid)"
+        [class.canvas-block--run-start]="isRunStart($index)"
+        [class.canvas-block--run-end]="isRunEnd($index)"
+        [class.canvas-drop-before]="dropTarget?.kind === 'block-before' && dropTarget?.uid === item.uid"
+        [class.canvas-drop-after]="dropTarget?.kind === 'block-after' && dropTarget?.uid === item.uid"
+        (click)="select(item.uid)"
+        (focusin)="select(item.uid)"
+        (dragstart)="onBlockDragStart($event, item.uid)"
+        (dragover)="onBlockDragOver($event, item.uid, null, null)"
+        (drop)="onDrop($event)"
+        (dragend)="onDragEnd()"
+        (change)="onBlockChange()"
+        (remove)="removeBlock(item.uid)"
+        (duplicate)="duplicateBlock(item.uid)"
+        (plusClick)="onPlus(item.uid, $event)"
+        (newBlockAfter)="newBlockAfter(item.uid)"
+        (removeEmpty)="removeEmptyBlock(item.uid)"
+        (slash)="onSlash(item.uid, $event)"
+      />
+    }
+  }
+
+  @if (items.length === 0) {
+    <div class="canvas-empty">
+      <p class="text-muted">Страница пуста — добавьте первый блок.</p>
+      <button type="button" class="btn btn--primary" (click)="openInsertAtEnd($event)">+ Добавить блок</button>
+    </div>
+  }
+
+  <div
+    class="canvas-tail"
+    [class.canvas-tail--active]="dragState"
+    (dragover)="onTailDragOver($event)"
+    (drop)="onDrop($event)"
+  ></div>
+
+  @if (insertMenu) {
+    <div
+      class="canvas-insert"
+      [style.left.px]="insertMenu.left"
+      [style.top.px]="insertMenu.top"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="canvas-insert__title">{{ insertMenu.mode === 'convert' ? 'Преобразовать в…' : 'Вставить блок' }}</div>
+      @for (mi of menuItems; track mi.key) {
+        <button type="button" class="canvas-insert__item" (click)="chooseMenuItem(mi.key)">
+          <span class="canvas-insert__icon">{{ mi.icon }}</span>{{ mi.label }}
+        </button>
+      }
+    </div>
+  }
+</div>

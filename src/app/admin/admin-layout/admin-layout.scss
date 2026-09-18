@@ -1,132 +1,310 @@
-.admin {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  min-height: 100vh;
-  background: var(--color-bg);
+@font-face {
+  font-family: 'Inter Admin';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/Inter-cyrillic.woff2') format('woff2');
 }
 
+/* =====================================================================
+   Современная админка в стиле новых панелей (WordPress 6 / Notion)
+   Светлый сайдбар, тонкие рамки, мягкие тени, иконки.
+   ===================================================================== */
+
+.admin,
+.admin :where(button, input, select, textarea) {
+  font-family: 'Inter Admin', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.admin {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #1f2937;
+  --admin-border: #e5e7eb;
+  --admin-border-soft: #f3f4f6;
+  --admin-primary: #2271b1; /* синий как в WordPress */
+  --admin-primary-dark: #135e96;
+  --admin-primary-bg: rgba(34, 113, 177, 0.08);
+  --admin-text: #1f2937;
+  --admin-muted: #6b7280;
+  --admin-bg: #f0f0f1; /* серый фон как в WP */
+  --admin-sidebar: #1d2327; /* тёмный сайдбар как в WP */
+  --admin-sidebar-hover: #2c3338;
+  --admin-active: #2271b1;
+  --admin-card: #ffffff;
+  --admin-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+.admin {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  min-height: 100vh;
+  background: var(--admin-bg);
+  transition: grid-template-columns 0.18s ease;
+}
+
+/* ---------------- Сайдбар ---------------- */
 .admin__sidebar {
-  background: var(--color-dark);
-  color: #fff;
+  background: var(--admin-sidebar);
+  color: #c3c4c7;
   display: flex;
   flex-direction: column;
-  padding: 1.25rem 1rem;
-  gap: 1.5rem;
   position: sticky;
   top: 0;
   height: 100vh;
+  overflow-y: auto;
+  z-index: 10;
 }
 
 .admin__brand {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.6rem;
+  padding: 1rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .admin__brand-mark {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2271b1, #135e96);
+  color: #fff;
   font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
 }
 
-.admin__brand small {
+.admin__brand-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.admin__brand-text {
+  min-width: 0;
+}
+
+.admin__brand-text strong {
   display: block;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.72rem;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+.admin__brand-text small {
+  display: block;
+  color: #a7aaad;
+  font-size: 0.68rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------------- Меню ---------------- */
 .admin__nav {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  flex: 1;
+  padding: 0.4rem 0.5rem;
+}
+
+.admin__nav-label {
+  padding: 0.6rem 0.6rem 0.3rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8c8f94;
 }
 
 .admin__nav a {
-  color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #c3c4c7;
   text-decoration: none;
-  padding: 0.6rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  transition: background 0.2s, color 0.2s;
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .admin__nav a:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--admin-sidebar-hover);
   color: #fff;
 }
 
 .admin__link--active {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--admin-active) !important;
   color: #fff !important;
   font-weight: 600;
 }
 
+.admin__link--active .admin__icon {
+  color: #fff;
+}
+
+.admin__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.admin__nav a:hover .admin__icon {
+  opacity: 1;
+}
+
+/* ---------------- Низ сайдбара ---------------- */
 .admin__footer-nav {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  padding-top: 1rem;
+  gap: 0.15rem;
+  margin-top: auto;
+  padding: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.admin__footer-nav a {
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  font-size: 0.9rem;
-  padding: 0.4rem 0.5rem;
-}
-
+.admin__footer-nav a,
 .admin__logout {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #c3c4c7;
+  text-decoration: none;
+  font-size: 0.82rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
   background: none;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
-  border-radius: 8px;
-  padding: 0.5rem 0.75rem;
+  border: 0;
   cursor: pointer;
   font-family: inherit;
-  font-size: 0.9rem;
   text-align: left;
+  transition: background 0.15s, color 0.15s;
 }
 
+.admin__footer-nav a:hover,
 .admin__logout:hover {
-  border-color: #fff;
+  background: var(--admin-sidebar-hover);
+  color: #fff;
 }
 
-.admin__content {
-  padding: 1.5rem 2rem;
-  max-width: 1100px;
+/* ---------------- Контент ---------------- */
+.admin__main {
+  min-width: 0;
 }
 
 .admin__topbar {
   display: flex;
-  justify-content: flex-end;
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin__topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.admin__toggle {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--admin-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.admin__toggle:hover {
+  color: var(--admin-primary);
+  border-color: var(--admin-primary);
+  background: var(--admin-primary-bg);
+}
+
+.admin__page-title h1 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--admin-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .admin__user {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.admin__user-avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2271b1, #135e96);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.admin__user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.admin__user-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.admin__user-name {
   font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--admin-text);
 }
 
 .admin__role {
-  display: inline-block;
-  margin-left: 0.5rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: 20px;
-  background: var(--color-primary-bg);
-  color: var(--color-primary);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 0.68rem;
+  color: var(--admin-muted);
+  text-transform: capitalize;
 }
 
-@media (max-width: 800px) {
+.admin__content {
+  padding: 1.25rem 1.5rem 2rem;
+}
+
+/* ---------------- Мобильный ---------------- */
+@media (max-width: 782px) {
   .admin {
     grid-template-columns: 1fr;
   }
@@ -136,7 +314,104 @@
     height: auto;
   }
 
+  .admin__brand {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .admin__nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0.3rem 0.5rem;
+    gap: 0.2rem;
+  }
+
+  .admin__nav-label {
+    display: none;
+  }
+
+  .admin__nav a {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.78rem;
+  }
+
+  .admin__footer-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .admin__topbar {
+    padding: 0.6rem 0.85rem;
+  }
+
   .admin__content {
-    padding: 1rem;
+    padding: 0.85rem;
+  }
+
+  .admin__toggle {
+    display: none;
+  }
+}
+
+/* ---------------- Свёрнутый сайдбар (только иконки, десктоп) ---------------- */
+@media (min-width: 783px) {
+  .admin--collapsed {
+    grid-template-columns: 64px 1fr;
+  }
+
+  .admin--collapsed .admin__sidebar {
+    overflow-x: hidden;
+  }
+
+  .admin--collapsed .admin__brand {
+    justify-content: center;
+    padding: 1rem 0.4rem;
+    gap: 0;
+  }
+
+  .admin--collapsed .admin__brand-text {
+    display: none;
+  }
+
+  .admin--collapsed .admin__nav {
+    align-items: center;
+    padding: 0.4rem 0.4rem;
+  }
+
+  .admin--collapsed .admin__nav-label {
+    display: none;
+  }
+
+  .admin--collapsed .admin__nav a {
+    justify-content: center;
+    padding: 0.5rem;
+    width: 100%;
+    gap: 0;
+  }
+
+  .admin--collapsed .admin__nav a span {
+    display: none;
+  }
+
+  .admin--collapsed .admin__nav a .admin__icon {
+    margin: 0;
+  }
+
+  .admin--collapsed .admin__footer-nav {
+    align-items: center;
+    padding: 0.5rem 0.4rem;
+  }
+
+  .admin--collapsed .admin__footer-nav a,
+  .admin--collapsed .admin__logout {
+    justify-content: center;
+    padding: 0.45rem;
+    width: 100%;
+    gap: 0;
+  }
+
+  .admin--collapsed .admin__footer-nav a span,
+  .admin--collapsed .admin__logout span {
+    display: none;
   }
 }

@@ -1,0 +1,175 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div class="services-head">
+      <h1>Каталог услуг и товаров</h1>
+      <div class="services-head__actions">
+        <a class="btn btn--outline" routerLink="/admin/service-categories">Группы</a>
+        <a class="btn btn--outline" routerLink="/admin/service-templates">Шаблоны карточек</a>
+        <a class="btn btn--primary" routerLink="/admin/services/new">+ Добавить</a>
+      </div>
+    </div>
+    <p class="text-muted">
+      Услуги и товары: цена, описания, медиа, длительность и буферы для календаря, комментарии и рейтинг,
+      доступ по ролям. Флаги «Календарь» и «Магазин» включают запись и продажу для каждой позиции отдельно.
+      Разделы «Услуги» и «Товары» включаются на сайте отдельными чекбоксами ниже.
+    </p>
+  </div>
+
+  @if (error) {
+    <p class="admin-error">{{ error }}</p>
+  }
+
+  @for (card of sectionCards; track card.name) {
+    <div class="card services-section">
+      <label class="services-check">
+        <input
+          type="checkbox"
+          [checked]="sections[card.name].enabled"
+          (change)="toggleSection(card.name, $any($event.target).checked)"
+        />
+        <span>Раздел «{{ card.label }}» активен на сайте</span>
+      </label>
+      <div class="services-section__access">
+        <span class="services-section__label">Доступ к разделу: <strong>{{ rolesLabel(card.name) }}</strong></span>
+        <button type="button" class="btn btn--outline btn--small" (click)="openRoles(card.name)">Изменить доступ</button>
+      </div>
+      <div class="services-section__actions">
+        <button
+          type="button"
+          class="btn btn--primary btn--small"
+          (click)="saveSection(card.name)"
+          [disabled]="savingSection === card.name"
+        >
+          {{ savingSection === card.name ? 'Сохранение…' : 'Сохранить настройки' }}
+        </button>
+        @if (savedSection === card.name) {
+          <span class="admin-saved">✓ Сохранено</span>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="card services-filters">
+        <label class="services-field services-field--search">
+          <span>Поиск</span>
+          <input class="admin-input" [value]="filterQ" (input)="onFilterQ($any($event.target).value)" placeholder="Название или адрес" />
+        </label>
+    <label class="services-field">
+      <span>Тип</span>
+      <select class="admin-input" [value]="filterKind" (change)="onFilterKind($any($event.target).value)">
+        <option value="">Все</option>
+        <option value="service">Услуги</option>
+        <option value="product">Товары</option>
+      </select>
+    </label>
+    <label class="services-field">
+      <span>Группа</span>
+          <select class="admin-input" (change)="onFilterCategory($any($event.target).value)">
+            <option value="0" [selected]="!filterCategory">Все группы</option>
+            @for (c of categoryFilterOptions(); track c.id) {
+              <option [value]="c.id" [selected]="c.id === filterCategory">{{ c.title }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else {
+    <div class="card">
+      <div class="services-list">
+        @for (item of items; track item.id) {
+          <div class="service-row" [class.service-row--inactive]="!item.active">
+            <div class="service-row__cover">
+              @if (item.cover) {
+                <img [src]="item.cover" alt="" />
+              } @else {
+                <span class="service-row__noimg">Нет фото</span>
+              }
+            </div>
+            <div class="service-row__main">
+              <div class="service-row__title">
+                <strong>{{ item.title }}</strong>
+                @if (item.kind === 'product') {
+                  <span class="service-row__badge">товар</span>
+                }
+                @if (!item.active) {
+                  <span class="service-row__badge service-row__badge--muted">скрыта</span>
+                }
+              </div>
+              <div class="service-row__meta">
+                <span>{{ priceLabel(item) }}</span>
+                @if (item.category_title) {
+                  <span>· {{ item.category_title }}</span>
+                }
+                @if (item.unit === 'time') {
+                  <span>· {{ item.duration_min }} мин</span>
+                }
+              </div>
+              <div class="service-row__flags">
+                @if (item.booking_enabled) {
+                  <span class="service-flag">календарь</span>
+                }
+                @if (item.shop_enabled) {
+                  <span class="service-flag">магазин</span>
+                }
+                @if (item.comments_enabled) {
+                  <span class="service-flag">комментарии</span>
+                }
+                @if (item.rating_enabled) {
+                  <span class="service-flag">рейтинг</span>
+                }
+              </div>
+            </div>
+            <div class="service-row__tools">
+              <a class="btn-icon" title="Изменить" [routerLink]="['/admin/services', item.id]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+              </a>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-muted">Позиций пока нет. Добавьте первую услугу или товар.</p>
+        }
+      </div>
+    </div>
+
+    @if (!loading && total > 0) {
+      <div class="services-pagination">
+        <span class="services-pagination__info">Показано {{ fromLabel() }}–{{ toLabel() }} из {{ total }}</span>
+        @if (pages > 1) {
+          <div class="services-pagination__pages">
+            <button type="button" class="btn-icon" title="Назад" [disabled]="page <= 1" (click)="setPage(page - 1)">←</button>
+            @for (p of pageNumbers(); track p) {
+              <button
+                type="button"
+                class="services-pagination__page"
+                [class.services-pagination__page--active]="p === page"
+                (click)="setPage(p)"
+              >
+                {{ p }}
+              </button>
+            }
+            <button type="button" class="btn-icon" title="Вперёд" [disabled]="page >= pages" (click)="setPage(page + 1)">→</button>
+          </div>
+        }
+        <label class="services-pagination__size">
+          <span>На странице:</span>
+          <select class="admin-input" (change)="setPerPage($any($event.target).value)">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size" [selected]="size === perPage">{{ size }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    }
+  }
+</section>
+
+@if (rolesPickerFor) {
+  <app-admin-roles-picker
+    [roles]="roles"
+    [selected]="rolesPickerSection()?.roles ?? null"
+    (applied)="applyRoles($event)"
+    (closed)="closeRoles()"
+  />
+}

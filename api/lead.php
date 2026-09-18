@@ -1,49 +1,20 @@
 <?php
 /**
- * Шлюз лидов (почта + MySQL).
+ * Шлюз лидов (MySQL + очередь писем).
  *
- * Режимы:
- *  - APP_ENV=dev  — пишет в MySQL, письмо НЕ отправляет
- *  - APP_ENV=prod — полный цикл: письмо (Яндекс SMTP) + запись в MySQL
+ * Заявка сохраняется в MySQL, письмо ставится в очередь (email_queue):
+ * при сбое SMTP оно не теряется, попытки повторяются, видно в админке
+ * («Почта» → «Очередь писем»). SMTP-сервисы настраиваются в админке.
  *
- * Секреты берутся из переменных окружения (.env или реального окружения).
  * Файл НЕ должен быть доступен на чтение извне — только приём POST.
  */
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/bootstrap.php';
+
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
-
-// ---------------------------------------------------------------------
-// Загрузка .env (если файл есть рядом)
-// ---------------------------------------------------------------------
-function loadEnv(string $file): void
-{
-    if (!is_file($file)) {
-        return;
-    }
-    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    if ($lines === false) {
-        return;
-    }
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if ($line === '' || $line[0] === '#' || !str_contains($line, '=')) {
-            continue;
-        }
-        [$key, $value] = explode('=', $line, 2);
-        $key = trim($key);
-        $value = trim($value);
-        if ($key === '' || getenv($key) !== false) {
-            continue;
-        }
-        putenv($key . '=' . $value);
-        $_ENV[$key] = $value;
-    }
-}
-
-loadEnv(__DIR__ . '/.env');
 
 // ---------------------------------------------------------------------
 // Только POST
@@ -57,19 +28,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
 // ---------------------------------------------------------------------
 // Конфигурация из окружения
 // ---------------------------------------------------------------------
-$env = getenv('APP_ENV') ?: 'dev';
 $config = [
-    'env' => $env,
     'db_host' => getenv('DB_HOST') ?: '127.0.0.1',
     'db_port' => getenv('DB_PORT') ?: '3306',
     'db_name' => getenv('DB_NAME') ?: 'it_services',
     'db_user' => getenv('DB_USER') ?: 'root',
     'db_pass' => getenv('DB_PASS') ?: '',
-    'smtp_host' => getenv('SMTP_HOST') ?: 'smtp.yandex.ru',
-    'smtp_port' => (int) (getenv('SMTP_PORT') ?: '465'),
-    'smtp_user' => getenv('SMTP_USER') ?: '',
-    'smtp_pass' => getenv('SMTP_PASS') ?: '',
-    'mail_to' => getenv('MAIL_TO') ?: 'hello@example.ru',
 ];
 
 // ---------------------------------------------------------------------
@@ -177,11 +141,15 @@ try {
 }
 
 // ---------------------------------------------------------------------
-// Письмо (только в prod)
+// Письмо: ставим в очередь — при сбое SMTP письмо не теряется,
+// попытки повторяются (обработка — при заходах в админку и из cron)
 // ---------------------------------------------------------------------
-$mailOk = true;
-if ($env === 'prod') {
-    $mailOk = sendMail($config, $leadType, [
+if ($dbOk) {
+    $mailTo = getenv('MAIL_TO') ?: 'hello@example.ru';
+    $mailSubject = $leadType === 'partner'
+        ? 'Новый лид: ПАРТНЁР — ' . $name
+        : 'Новый лид: ' . $name;
+    $mailText = leadMailText($leadType, [
         'lead_id' => $leadId,
         'name' => $name,
         'phone' => $phone,
@@ -194,27 +162,26 @@ if ($env === 'prod') {
         'utm_campaign' => $utmCampaign,
         'page' => $page,
     ]);
+    $mailHtml = '<pre style="font:13px/1.5 monospace; white-space:pre-wrap">'
+        . htmlspecialchars($mailText, ENT_QUOTES, 'UTF-8') . '</pre>';
+    require_once __DIR__ . '/email_queue.php';
+    $queueId = emailQueueAdd($mailTo, $mailSubject, $mailHtml, $mailText, 'leads');
+    emailQueueTrySendNow($queueId);
 }
 
 // ---------------------------------------------------------------------
-// Ответ
+// Ответ: заявка сохранена — успех; письмо уйдёт (при сбое — с повторами)
 // ---------------------------------------------------------------------
-if ($dbOk && ($env !== 'prod' || $mailOk)) {
+if ($dbOk) {
     echo json_encode(['ok' => true, 'lead_id' => $leadId]);
 } else {
     http_response_code(500);
     echo json_encode(['ok' => false, 'error' => 'Failed to save lead']);
 }
 
-/**
- * Отправка письма через SMTP (без внешних библиотек, сокет + STARTTLS/SSL).
- */
-function sendMail(array $cfg, string $leadType, array $d): bool
+/** Текст письма о новом лиде. */
+function leadMailText(string $leadType, array $d): string
 {
-    $subject = $leadType === 'partner'
-        ? 'Новый лид: ПАРТНЁР — ' . ($d['name'] ?? '')
-        : 'Новый лид: ' . ($d['name'] ?? '');
-
     $lines = [];
     $lines[] = 'Новая заявка с сайта';
     $lines[] = '-------------------';
@@ -242,113 +209,5 @@ function sendMail(array $cfg, string $leadType, array $d): bool
     }
     $lines[] = 'Страница: ' . ($d['page'] ?: '-');
     $lines[] = 'Lead ID: ' . $d['lead_id'];
-    $body = implode("\n", $lines);
-
-    $mail = "From: {$cfg['smtp_user']}\r\n"
-        . "To: {$cfg['mail_to']}\r\n"
-        . 'Subject: =?UTF-8?B?' . base64_encode($subject) . "?=\r\n"
-        . "MIME-Version: 1.0\r\n"
-        . "Content-Type: text/plain; charset=UTF-8\r\n"
-        . "Content-Transfer-Encoding: base64\r\n"
-        . "\r\n"
-        . base64_encode($body);
-
-    $errno = 0;
-    $errstr = '';
-    $host = $cfg['smtp_host'];
-    $port = $cfg['smtp_port'];
-
-    // SSL-сокет (465)
-    $fp = @stream_socket_client(
-        "ssl://{$host}:{$port}",
-        $errno,
-        $errstr,
-        15,
-        STREAM_CLIENT_CONNECT,
-        stream_context_create(['ssl' => ['verify_peer' => true, 'verify_peer_name' => true]])
-    );
-
-    if (!$fp) {
-        error_log("Lead SMTP connect failed: {$errno} {$errstr}");
-        return false;
-    }
-
-    $read = function () use ($fp): string {
-        $resp = '';
-        while ($line = fgets($fp, 515)) {
-            $resp .= $line;
-            // Код из 3 цифр + пробел = финальная строка ответа
-            if (isset($line[3]) && $line[3] === ' ') {
-                break;
-            }
-        }
-        return trim($resp);
-    };
-
-    $ok = function (string $resp): bool {
-        return isset($resp[0]) && $resp[0] === '2' || isset($resp[0]) && $resp[0] === '3';
-    };
-
-    $resp = $read(); // 220
-    if (!$ok($resp)) {
-        fclose($fp);
-        return false;
-    }
-
-    fwrite($fp, "EHLO lead.local\r\n");
-    $resp = $read();
-    if (!$ok($resp)) {
-        fclose($fp);
-        return false;
-    }
-
-    fwrite($fp, "AUTH LOGIN\r\n");
-    $resp = $read();
-    if (!$ok($resp)) {
-        fclose($fp);
-        return false;
-    }
-
-    fwrite($fp, base64_encode($cfg['smtp_user']) . "\r\n");
-    $resp = $read();
-    if (!$ok($resp)) {
-        fclose($fp);
-        return false;
-    }
-
-    fwrite($fp, base64_encode($cfg['smtp_pass']) . "\r\n");
-    $resp = $read();
-    if (!$ok($resp)) {
-        fclose($fp);
-        return false;
-    }
-
-    fwrite($fp, "MAIL FROM:<{$cfg['smtp_user']}>\r\n");
-    $resp = $read();
-    if (!$ok($resp)) {
-        fclose($fp);
-        return false;
-    }
-
-    fwrite($fp, "RCPT TO:<{$cfg['mail_to']}>\r\n");
-    $resp = $read();
-    if (!$ok($resp)) {
-        fclose($fp);
-        return false;
-    }
-
-    fwrite($fp, "DATA\r\n");
-    $resp = $read();
-    if (!$ok($resp)) {
-        fclose($fp);
-        return false;
-    }
-
-    fwrite($fp, $mail . "\r\n.\r\n");
-    $resp = $read();
-
-    fwrite($fp, "QUIT\r\n");
-    fclose($fp);
-
-    return $ok($resp);
+    return implode("\n", $lines);
 }

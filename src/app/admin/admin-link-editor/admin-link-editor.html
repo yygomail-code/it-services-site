@@ -1,0 +1,38 @@
+<div class="link-editor" [class.link-editor--invalid]="error">
+  <input
+    class="admin-input"
+    [value]="link.label"
+    (input)="onLabel($any($event.target).value)"
+    placeholder="Текст ссылки"
+  />
+  <select
+    class="admin-input link-editor__select"
+    (change)="onTargetSelect($any($event.target).value)"
+    title="Выбрать ссылку из списка"
+  >
+    <option value="" [selected]="selectedTarget() === ''">— вручную —</option>
+    @if (pages.length) {
+      <optgroup label="Страницы">
+        @for (page of pages; track page.id) {
+          <option [value]="pageHref(page)" [selected]="pageHref(page) === link.url">{{ page.title }}</option>
+        }
+      </optgroup>
+    }
+    @for (group of catalogGroups(); track group) {
+      <optgroup [label]="group">
+        @for (target of catalogByGroup(group); track target.url) {
+          <option [value]="target.url" [selected]="target.url === link.url">{{ target.label }}</option>
+        }
+      </optgroup>
+    }
+  </select>
+  <input
+    class="admin-input"
+    [value]="link.url"
+    (input)="onUrl($any($event.target).value)"
+    placeholder="/stranica или https://…"
+  />
+  @if (error) {
+    <p class="link-editor__error" role="alert">{{ error }}</p>
+  }
+</div>

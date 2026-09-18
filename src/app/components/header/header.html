@@ -1,27 +1,39 @@
 <header class="header">
   <div class="container header__inner">
     <a class="header__logo" routerLink="/" (click)="closeMenu()">
-      <span class="header__logo-mark">Л</span>
-      <span class="header__logo-text">Литвинов&nbsp;Антон<br /><small>разработка и сопровождение сайтов</small></span>
+      @if (brandLogo) {
+        <img class="header__logo-img" [src]="brandLogo" alt="" />
+      } @else {
+        <span class="header__logo-mark">{{ brandMark }}</span>
+      }
+      <span class="header__logo-text" [class.header__logo-text--large]="subtitleLarge">
+        {{ brandName }}
+        @if (subtitle) {
+          <br /><small>{{ subtitle }}</small>
+        }
+      </span>
     </a>
 
     <nav class="header__nav" [class.header__nav--open]="menuOpen" aria-label="Главное меню">
-      <a routerLink="/" routerLinkActive="header__link--active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Главная</a>
-      <a routerLink="/services" routerLinkActive="header__link--active" (click)="closeMenu()">Услуги</a>
-      <a routerLink="/portfolio" routerLinkActive="header__link--active" (click)="closeMenu()">Портфолио</a>
-      <a routerLink="/about" routerLinkActive="header__link--active" (click)="closeMenu()">Обо мне</a>
-      <a routerLink="/partners" routerLinkActive="header__link--active" (click)="closeMenu()">Сотрудничество</a>
-      <a routerLink="/contacts" routerLinkActive="header__link--active" (click)="closeMenu()">Контакты</a>
-
-      @if (user()) {
-        <a class="header__auth" [routerLink]="profileLink" (click)="closeMenu()">
-          {{ user()?.full_name || user()?.login }}
-        </a>
-      } @else {
-        <a class="header__auth" routerLink="/login" (click)="closeMenu()">Войти</a>
+      @for (item of menuItems; track item.label + item.url) {
+        <a
+          [routerLink]="isExternal(item.url) ? null : item.url"
+          [attr.href]="isExternal(item.url) ? item.url : null"
+          [attr.target]="isExternal(item.url) ? '_blank' : null"
+          [attr.rel]="isExternal(item.url) ? 'noopener' : null"
+          routerLinkActive="header__link--active"
+          [routerLinkActiveOptions]="isExact(item.url) ? exactOptions : looseOptions"
+          (click)="closeMenu()"
+        >{{ item.label }}</a>
       }
 
-      <a class="header__cta" routerLink="/contacts" (click)="closeMenu()">Обсудить проект</a>
+      @if (cta) {
+        @if (isExternal(cta.url)) {
+          <a class="header__cta" [href]="cta.url" target="_blank" rel="noopener" (click)="closeMenu()">{{ cta.label }}</a>
+        } @else {
+          <a class="header__cta" [routerLink]="cta.url" (click)="closeMenu()">{{ cta.label }}</a>
+        }
+      }
     </nav>
 
     <button

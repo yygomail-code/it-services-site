@@ -1,0 +1,448 @@
+<div class="canvas-block" [class.canvas-block--selected]="selected">
+  <div class="canvas-block__gutter">
+    <button type="button" class="canvas-block__grip" draggable="true" title="Перетащить или открыть меню" (click)="toggleMenu($event)">⠿</button>
+    <button type="button" class="canvas-block__plus" title="Добавить блок" (click)="onPlus($event)">+</button>
+  </div>
+
+  <div class="canvas-block__body" (mousedown)="closeMenus()">
+    @switch (type) {
+      @case ('text') {
+        <div
+          class="pc-block pc-block--text"
+          [class.pc-block--align-center]="align === 'center'"
+          [class.pc-block--align-right]="align === 'right'"
+          [style.fontSize]="fontSize"
+          [style.fontFamily]="fontFamily"
+        >
+          <app-canvas-text
+            variant="text"
+            [value]="textValue"
+            [autofocus]="autofocus"
+            (valueChange)="onTextChange($event)"
+            (newBlockAfter)="newBlockAfter.emit()"
+            (removeEmpty)="removeEmpty.emit()"
+            (slash)="slash.emit($event)"
+            placeholder="Начните писать…"
+          />
+        </div>
+      }
+
+      @case ('heading') {
+        <div
+          class="pc-block pc-heading"
+          [class.pc-heading--h1]="headingLevel === 'h1'"
+          [class.pc-heading--h2]="headingLevel === 'h2'"
+          [class.pc-heading--h3]="headingLevel === 'h3'"
+          [class.pc-heading--h4]="headingLevel === 'h4'"
+          [class.pc-block--align-center]="align === 'center'"
+          [class.pc-block--align-right]="align === 'right'"
+          [style.fontSize]="fontSize"
+          [style.fontFamily]="fontFamily"
+        >
+          <app-canvas-text
+            variant="heading"
+            [headingLevel]="headingLevel"
+            [value]="textValue"
+            [autofocus]="autofocus"
+            (valueChange)="onTextChange($event)"
+            (newBlockAfter)="newBlockAfter.emit()"
+            (removeEmpty)="removeEmpty.emit()"
+            (slash)="slash.emit($event)"
+            placeholder="Заголовок…"
+          />
+        </div>
+      }
+
+      @case ('image') {
+        <figure
+          class="pc-block pc-block--image"
+          [class.pc-block--align-center]="align === 'center'"
+          [class.pc-block--align-right]="align === 'right'"
+          [style.maxWidth]="imageMaxWidth()"
+        >
+          @if (imageUrl) {
+            <img [src]="imageUrl" [alt]="imageAlt || imageCaption" />
+          } @else {
+            <button type="button" class="canvas-block__placeholder" (click)="openSettings()">Выбрать изображение</button>
+          }
+          @if (imageCaption) {
+            <figcaption>{{ imageCaption }}</figcaption>
+          }
+        </figure>
+      }
+
+      @case ('gallery') {
+        @if (galleryImages.length) {
+          <div
+            class="pc-block pc-block--gallery"
+            [class.pc-gallery--cols]="galleryColumns"
+            [style.--pc-gallery-cols]="galleryColumns"
+          >
+            @for (img of galleryImages; track img; let i = $index) {
+              <span class="canvas-block__gallery-item">
+                <img [src]="img" alt="" />
+                <button type="button" class="canvas-block__gallery-remove" title="Убрать" (click)="removeGalleryImage(i)">✕</button>
+              </span>
+            }
+          </div>
+        } @else {
+          <div class="pc-block">
+            <button type="button" class="canvas-block__placeholder" (click)="openSettings()">Добавить изображения</button>
+          </div>
+        }
+      }
+
+      @case ('form') {
+        <div class="pc-block pc-block--form" [style.maxWidth]="formMaxWidth()">
+          @if (formId > 0) {
+            <div class="canvas-block__live">
+              <app-form-render [formId]="formId" />
+            </div>
+          } @else {
+            <button type="button" class="canvas-block__placeholder" (click)="openSettings()">Выбрать форму</button>
+          }
+        </div>
+      }
+
+      @case ('button') {
+        <div
+          class="pc-block pc-block--button"
+          [class.pc-block--align-center]="align === 'center'"
+          [class.pc-block--align-right]="align === 'right'"
+        >
+          <span
+            class="btn"
+            [class.btn--primary]="buttonStyle === 'primary'"
+            [class.btn--outline]="buttonStyle === 'outline'"
+            [class.btn--ghost]="buttonStyle === 'ghost'"
+          >{{ buttonText || 'Кнопка' }}</span>
+        </div>
+      }
+
+      @case ('divider') {
+        <hr class="pc-block pc-block--divider" />
+      }
+
+      @case ('quote') {
+        <blockquote class="pc-block pc-block--quote">
+          <app-canvas-text
+            variant="quote"
+            [value]="textValue"
+            [autofocus]="autofocus"
+            (valueChange)="onTextChange($event)"
+            (newBlockAfter)="newBlockAfter.emit()"
+            (removeEmpty)="removeEmpty.emit()"
+            (slash)="slash.emit($event)"
+            placeholder="Цитата…"
+          />
+          @if (quoteAuthor) {
+            <cite>{{ quoteAuthor }}</cite>
+          }
+        </blockquote>
+      }
+
+      @case ('list') {
+        <div class="canvas-block__list">
+          <app-canvas-text
+            variant="list"
+            [items]="listItems"
+            [ordered]="listOrdered"
+            [autofocus]="autofocus"
+            (listItemsChange)="onListItems($event)"
+            (removeEmpty)="removeEmpty.emit()"
+            placeholder="Пункт списка…"
+          />
+        </div>
+      }
+
+      @case ('html') {
+        <div class="pc-block pc-block--html">
+          <textarea
+            class="admin-textarea canvas-block__html"
+            [value]="htmlValue"
+            (input)="onHtml($any($event.target).value)"
+            rows="3"
+            placeholder="HTML-код"
+          ></textarea>
+        </div>
+      }
+
+      @case ('services') {
+        <div class="pc-block pc-block--catalog">
+          <div class="canvas-block__live">
+            <app-services-grid />
+          </div>
+        </div>
+      }
+
+      @case ('cases') {
+        <div class="pc-block pc-block--catalog">
+          <div class="canvas-block__live">
+            <app-cases-grid [limit]="casesLimit" [filters]="casesFilters" />
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  @if (menuOpen) {
+    <div class="canvas-menu" (click)="$event.stopPropagation()">
+      <button type="button" class="canvas-menu__item" (click)="openSettings()">Настройки</button>
+      <button type="button" class="canvas-menu__item" (click)="duplicate.emit()">Дублировать</button>
+      <button type="button" class="canvas-menu__item canvas-menu__item--danger" (click)="remove.emit()">Удалить</button>
+    </div>
+  }
+
+  @if (settingsOpen) {
+    <div class="canvas-pop" (click)="$event.stopPropagation()">
+      <div class="canvas-pop__head">
+        <span>{{ typeLabel }}</span>
+        <button type="button" class="canvas-pop__close" title="Закрыть" (click)="closeMenus()">✕</button>
+      </div>
+
+      <div class="canvas-pop__body">
+        @switch (type) {
+          @case ('text') {
+            <label class="canvas-field">
+              <span>Выравнивание</span>
+              <select class="admin-input" [value]="align" (change)="setAlign($any($event.target).value)">
+                <option value="left">Слева</option>
+                <option value="center">По центру</option>
+                <option value="right">Справа</option>
+              </select>
+            </label>
+            <label class="canvas-field">
+              <span>Размер текста</span>
+              <select class="admin-input" [value]="fontSize ?? ''" (change)="setFontSize($any($event.target).value)">
+                @for (fs of fontSizes; track fs.value) {
+                  <option [value]="fs.value">{{ fs.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="canvas-field">
+              <span>Шрифт</span>
+              <select class="admin-input" [value]="fontFamily ?? ''" (change)="setFontFamily($any($event.target).value)">
+                @for (ff of fontFamilies; track ff.value) {
+                  <option [value]="ff.value">{{ ff.label }}</option>
+                }
+              </select>
+            </label>
+          }
+
+          @case ('heading') {
+            <label class="canvas-field">
+              <span>Уровень</span>
+              <select class="admin-input" [value]="headingLevel" (change)="setLevel($any($event.target).value)">
+                <option value="h1">H1 — самый крупный</option>
+                <option value="h2">H2 — крупный</option>
+                <option value="h3">H3 — средний</option>
+                <option value="h4">H4 — малый</option>
+              </select>
+            </label>
+            <label class="canvas-field">
+              <span>Выравнивание</span>
+              <select class="admin-input" [value]="align" (change)="setAlign($any($event.target).value)">
+                <option value="left">Слева</option>
+                <option value="center">По центру</option>
+                <option value="right">Справа</option>
+              </select>
+            </label>
+            <label class="canvas-field">
+              <span>Размер текста</span>
+              <select class="admin-input" [value]="fontSize ?? ''" (change)="setFontSize($any($event.target).value)">
+                @for (fs of fontSizes; track fs.value) {
+                  <option [value]="fs.value">{{ fs.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="canvas-field">
+              <span>Шрифт</span>
+              <select class="admin-input" [value]="fontFamily ?? ''" (change)="setFontFamily($any($event.target).value)">
+                @for (ff of fontFamilies; track ff.value) {
+                  <option [value]="ff.value">{{ ff.label }}</option>
+                }
+              </select>
+            </label>
+          }
+
+          @case ('image') {
+            <button type="button" class="btn btn--outline btn--small" (click)="openPicker('image')">Медиатека…</button>
+            <label class="canvas-field">
+              <span>Ссылка</span>
+              <input class="admin-input" [value]="imageUrl" (input)="setImageField('url', $any($event.target).value)" placeholder="https://… или /uploads/…" />
+            </label>
+            <label class="canvas-field">
+              <span>Alt-текст</span>
+              <input class="admin-input" [value]="imageAlt" (input)="setImageField('alt', $any($event.target).value)" placeholder="Описание картинки" />
+            </label>
+            <label class="canvas-field">
+              <span>Подпись</span>
+              <input class="admin-input" [value]="imageCaption" (input)="setImageField('caption', $any($event.target).value)" placeholder="Необязательно" />
+            </label>
+            <div class="canvas-field">
+              <span>Ширина</span>
+              <div class="canvas-presets">
+                @for (w of widthPresets; track w.value) {
+                  <button
+                    type="button"
+                    class="canvas-preset"
+                    [class.canvas-preset--active]="imageWidth === w.value"
+                    (click)="setImageField('width', w.value)"
+                  >{{ w.label }}</button>
+                }
+              </div>
+            </div>
+            <label class="canvas-field">
+              <span>Своя ширина</span>
+              <input
+                class="admin-input"
+                [value]="customWidth(imageWidth)"
+                (input)="setImageField('width', $any($event.target).value)"
+                placeholder="например 420px или 60%"
+              />
+            </label>
+            <label class="canvas-field">
+              <span>Выравнивание</span>
+              <select class="admin-input" [value]="align" (change)="setAlign($any($event.target).value)">
+                <option value="left">Слева</option>
+                <option value="center">По центру</option>
+                <option value="right">Справа</option>
+              </select>
+            </label>
+          }
+
+          @case ('gallery') {
+            @for (img of galleryImages; track img; let i = $index) {
+              <div class="canvas-pop__img">
+                <img [src]="img" alt="" />
+                <button type="button" class="canvas-pop__img-remove" title="Убрать" (click)="removeGalleryImage(i)">✕</button>
+              </div>
+            }
+            <button type="button" class="btn btn--outline btn--small" (click)="openPicker('gallery')">Добавить из медиатеки…</button>
+            <label class="canvas-field">
+              <span>Колонок в галерее</span>
+              <select class="admin-input" [value]="galleryColumns ?? ''" (change)="setGalleryColumns($any($event.target).value)">
+                <option value="">Авто</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+            </label>
+          }
+
+          @case ('button') {
+            <label class="canvas-field">
+              <span>Текст</span>
+              <input class="admin-input" [value]="buttonText" (input)="setButtonField('text', $any($event.target).value)" placeholder="Кнопка" />
+            </label>
+            <label class="canvas-field">
+              <span>Ссылка</span>
+              <input class="admin-input" [value]="buttonUrl" (input)="setButtonField('url', $any($event.target).value)" placeholder="https://…" />
+            </label>
+            <label class="canvas-field">
+              <span>Стиль</span>
+              <select class="admin-input" [value]="buttonStyle" (change)="setButtonField('style', $any($event.target).value)">
+                <option value="primary">Основная</option>
+                <option value="outline">Контурная</option>
+                <option value="ghost">Прозрачная</option>
+              </select>
+            </label>
+            <label class="canvas-field">
+              <span>Открытие</span>
+              <select class="admin-input" [value]="buttonTarget" (change)="setButtonField('target', $any($event.target).value)">
+                <option value="_self">В этом окне</option>
+                <option value="_blank">В новой вкладке</option>
+              </select>
+            </label>
+            <label class="canvas-field">
+              <span>Выравнивание</span>
+              <select class="admin-input" [value]="align" (change)="setAlign($any($event.target).value)">
+                <option value="left">Слева</option>
+                <option value="center">По центру</option>
+                <option value="right">Справа</option>
+              </select>
+            </label>
+          }
+
+          @case ('form') {
+            <label class="canvas-field">
+              <span>Форма</span>
+              <select class="admin-input" [value]="formId" (change)="setFormId($any($event.target).value)">
+                <option value="0">— не выбрана —</option>
+                @for (f of forms; track f.id) {
+                  <option [value]="f.id">№{{ f.form_number }} — {{ f.title }}</option>
+                }
+              </select>
+            </label>
+            <div class="canvas-field">
+              <span>Ширина формы</span>
+              <div class="canvas-presets">
+                @for (w of widthPresets; track w.value) {
+                  <button
+                    type="button"
+                    class="canvas-preset"
+                    [class.canvas-preset--active]="formWidth === w.value"
+                    (click)="setFormWidth(w.value)"
+                  >{{ w.label }}</button>
+                }
+              </div>
+            </div>
+            <label class="canvas-field">
+              <span>Своя ширина</span>
+              <input
+                class="admin-input"
+                [value]="customWidth(formWidth)"
+                (input)="setFormWidth($any($event.target).value)"
+                placeholder="например 420px или 60%"
+              />
+            </label>
+          }
+
+          @case ('quote') {
+            <label class="canvas-field">
+              <span>Автор</span>
+              <input class="admin-input" [value]="quoteAuthor" (input)="onQuoteAuthor($any($event.target).value)" placeholder="Необязательно" />
+            </label>
+          }
+
+          @case ('list') {
+            <label class="canvas-check">
+              <input type="checkbox" [checked]="listOrdered" (change)="onListOrdered($any($event.target).checked)" />
+              <span>Нумерованный список</span>
+            </label>
+          }
+
+          @case ('services') {
+            <p class="canvas-hint">
+              Каталог услуг сайта: все услуги с карточками и ссылками на детальные страницы.
+              Настройки не требуются — список берётся из каталога услуг.
+            </p>
+          }
+
+          @case ('cases') {
+            <label class="canvas-field">
+              <span>Сколько карточек показать</span>
+              <input
+                type="number"
+                class="admin-input"
+                min="0"
+                max="48"
+                [value]="casesLimit"
+                (input)="setCasesLimit($any($event.target).value)"
+              />
+            </label>
+            <p class="canvas-hint">0 — показать все кейсы.</p>
+            <label class="canvas-check">
+              <input type="checkbox" [checked]="casesFilters" (change)="setCasesFilters($any($event.target).checked)" />
+              <span>Фильтр по категориям</span>
+            </label>
+          }
+        }
+      </div>
+    </div>
+  }
+
+  @if (pickerOpen) {
+    <app-admin-media-picker (pick)="onPick($event)" (closed)="closePicker()" />
+  }
+</div>

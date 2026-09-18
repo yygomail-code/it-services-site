@@ -1,0 +1,125 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div class="footer-head">
+      <h1>Хеадер</h1>
+      <div class="footer-actions">
+        @if (saved) {
+          <span class="admin-saved">✓ Сохранено</span>
+        }
+        <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving">
+          {{ saving ? 'Сохраняем…' : 'Сохранить' }}
+        </button>
+      </div>
+    </div>
+    <p class="text-muted">Верхняя часть сайта: подпись у логотипа, меню и кнопка</p>
+  </div>
+
+  @if (error) {
+    <p class="admin-error">{{ error }}</p>
+  }
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else {
+    <div class="footer-form">
+      <!-- Подпись -->
+      <div class="footer-card">
+        <h3>Подпись</h3>
+        <p class="footer-hint">
+          Маленький текст рядом с названием. Логотип, название и метка — в разделе «Бренд».
+        </p>
+
+        <div class="logo-rows">
+          <div class="logo-row">
+            <span class="logo-row__label">Подпись</span>
+            <input
+              class="admin-input"
+              [value]="subtitle"
+              (input)="onSubtitle($any($event.target).value)"
+              placeholder="разработка и сопровождение сайтов"
+            />
+            <button
+              type="button"
+              class="row-opt row-opt--letter"
+              [class.row-opt--on]="subtitleLarge"
+              [title]="subtitleLarge ? 'Обычный размер' : 'Крупнее'"
+              (click)="toggleSubtitleLarge(!subtitleLarge)"
+            >A</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Меню -->
+      <div class="footer-card">
+        <div class="footer-card__head">
+          <h3>Меню</h3>
+          <button type="button" class="btn btn--small" (click)="addItem()">+ Пункт</button>
+        </div>
+        <p class="footer-hint">
+          Пункты меню в шапке: текст, ссылка, порядок и видимость по ролям.
+          Ссылка «Войти» и имя пользователя добавляются автоматически.
+        </p>
+
+        @if (menu.length === 0) {
+          <p class="text-muted">Пунктов нет. Добавьте первый пункт меню.</p>
+        }
+
+        <div class="footer-links">
+          @for (item of menu; track $index; let i = $index) {
+            <div class="footer-link">
+              <app-admin-link-editor [link]="item" [pages]="pages" [catalog]="linkTargets" />
+              <button
+                type="button"
+                class="row-opt row-opt--eye"
+                [class.row-opt--eye-all]="visibilityLevel(item) === 'all'"
+                [class.row-opt--eye-partial]="visibilityLevel(item) === 'partial'"
+                [class.row-opt--eye-none]="visibilityLevel(item) === 'none'"
+                [title]="visibilityTitle(item)"
+                (click)="openVisibility('menu', i)"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              <div class="footer-link__tools">
+                <button type="button" class="btn-icon" title="Вверх" (click)="moveItem(i, -1)">↑</button>
+                <button type="button" class="btn-icon" title="Вниз" (click)="moveItem(i, 1)">↓</button>
+              </div>
+              <button type="button" class="btn-icon btn-icon--danger" title="Удалить пункт" (click)="removeItem(i)">✕</button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Кнопка -->
+      <div class="footer-card">
+        <h3>Кнопка</h3>
+        <p class="footer-hint">
+          Кнопка справа в шапке. Оставьте текст пустым, чтобы убрать её с сайта.
+        </p>
+
+        <div class="footer-link">
+          <app-admin-link-editor [link]="cta" [pages]="pages" [catalog]="linkTargets" />
+          <button
+            type="button"
+            class="row-opt row-opt--eye"
+            [class.row-opt--eye-all]="visibilityLevel(cta) === 'all'"
+            [class.row-opt--eye-partial]="visibilityLevel(cta) === 'partial'"
+            [class.row-opt--eye-none]="visibilityLevel(cta) === 'none'"
+            [title]="visibilityTitle(cta)"
+            (click)="openVisibility('cta')"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (visibilityOpen) {
+    <app-admin-roles-picker
+      [roles]="roles"
+      [selected]="visibilitySelected"
+      (applied)="applyVisibility($event)"
+      (closed)="closeVisibility()"
+    />
+  }
+</section>

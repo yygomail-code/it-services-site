@@ -1,0 +1,45 @@
+<section class="section section--tight">
+  <div class="container">
+    @if (loading) {
+      <p class="text-muted">Загрузка…</p>
+    } @else if (page?.restricted) {
+      <!-- Доступ закрыт по ролям -->
+      <div class="page-empty">
+        @if (user()) {
+          <h1>Нет доступа к этой странице</h1>
+          <p class="text-muted">
+            Страница доступна только определённым ролям. Если доступ нужен — напишите мне,
+            открою.
+          </p>
+          <div class="page-empty__actions">
+            <a routerLink="/" class="btn btn--primary">На главную</a>
+            <a routerLink="/contacts" class="btn btn--outline">Написать</a>
+          </div>
+        } @else {
+          <h1>Страница доступна после входа</h1>
+          <p class="text-muted">
+            Войдите в личный кабинет — и страница откроется. Если доступа нет, напишите мне.
+          </p>
+          <div class="page-empty__actions">
+            <a class="btn btn--primary" routerLink="/login" [queryParams]="{ returnUrl: returnUrl }">
+              Войти
+            </a>
+            <a routerLink="/" class="btn btn--outline">На главную</a>
+          </div>
+        }
+      </div>
+    } @else if (notFound || !page) {
+      <div class="page-empty">
+        <h1>Страница не найдена</h1>
+        <p class="text-muted">Такой страницы нет или она не опубликована.</p>
+        <div class="page-empty__actions">
+          <a routerLink="/" class="btn btn--primary">На главную</a>
+        </div>
+      </div>
+    } @else {
+      <article class="dynamic-page">
+        <app-page-content [blocks]="page.content || []" />
+      </article>
+    }
+  </div>
+</section>

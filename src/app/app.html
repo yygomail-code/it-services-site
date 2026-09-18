@@ -1,6 +1,8 @@
-<app-header />
-<main class="main">
-  <router-outlet />
-</main>
-<app-footer />
-<app-cookie-consent />
+<div class="app" [class.app--admin]="isAdminRoute()">
+  <app-header />
+  <main class="main">
+    <router-outlet />
+  </main>
+  <app-footer />
+  <app-cookie-consent ngSkipHydration />
+</div>

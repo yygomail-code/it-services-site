@@ -1,0 +1,247 @@
+.services-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.services-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.services-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.services-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.services-section__access {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.services-section__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+.services-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.services-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.services-field--search {
+  min-width: 240px;
+  flex: 1;
+}
+
+.services-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.service-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.service-row:last-child {
+  border-bottom: 0;
+}
+
+.service-row--inactive {
+  opacity: 0.6;
+}
+
+.service-row__cover {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  background: #f0f0f1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.service-row__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.service-row__noimg {
+  font-size: 0.68rem;
+  color: var(--color-muted);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.service-row__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.service-row__title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.service-row__badge {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.service-row__badge--muted {
+  background: #f0f0f1;
+  color: var(--color-muted);
+}
+
+.service-row__meta {
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.service-row__flags {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.service-flag {
+  font-size: 0.7rem;
+  padding: 0.08rem 0.4rem;
+  border-radius: 10px;
+  background: #f0f0f1;
+  color: #50575e;
+}
+
+.service-row__tools {
+  display: flex;
+  gap: 2px;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #dcdcde;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.btn-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.btn-icon:hover {
+  border-color: #2271b1;
+  color: #2271b1;
+}
+
+.services-pagination {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.services-pagination__info {
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+.services-pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.services-pagination__page {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 0.4rem;
+  border: 1px solid #dcdcde;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.services-pagination__page:hover {
+  border-color: #2271b1;
+  color: #2271b1;
+}
+
+.services-pagination__page--active {
+  background: #2271b1;
+  border-color: #2271b1;
+  color: #fff;
+}
+
+.services-pagination__page--active:hover {
+  color: #fff;
+}
+
+.services-pagination__size {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+.services-pagination__size .admin-input {
+  width: auto;
+  padding: 0.3rem 0.5rem;
+}

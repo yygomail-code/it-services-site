@@ -1,0 +1,156 @@
+.admin-error {
+  color: var(--color-danger);
+}
+
+.admin-saved {
+  color: var(--color-success);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.fb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.fb-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fb-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fb-card {
+  background: #fff;
+  border: 1px solid #e2e4e7;
+  border-radius: 8px;
+  padding: 1.1rem 1.25rem;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.fb-card h3 {
+  margin: 0 0 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.fb-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.fb-card__head h3 {
+  margin: 0;
+}
+
+.fb-hint {
+  margin: -0.3rem 0 0.7rem;
+  font-size: 0.78rem;
+  color: #8c8f94;
+}
+
+/* Строка копирайта — на всю доступную ширину */
+.fb-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fb-row .admin-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.fb-row__opt {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: 1px solid #dcdcde;
+  border-radius: 5px;
+  background: #fff;
+  color: #c3c4c7;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.fb-row__opt:hover {
+  border-color: #2271b1;
+  color: #2271b1;
+}
+
+.fb-row__opt--on {
+  color: #2271b1;
+  border-color: #b7c8dd;
+  background: #f0f6fc;
+}
+
+.fb-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fb-link {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.fb-link app-admin-link-editor {
+  flex: 1;
+  min-width: 0;
+}
+
+.fb-link__tools {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #dcdcde;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.btn-icon:hover {
+  border-color: #2271b1;
+  color: #2271b1;
+}
+
+.btn-icon--danger:hover {
+  border-color: #d63638;
+  color: #d63638;
+}
+
+@media (max-width: 600px) {
+  .fb-link {
+    flex-wrap: wrap;
+  }
+
+  .fb-link app-admin-link-editor {
+    flex: 1 1 100%;
+  }
+}

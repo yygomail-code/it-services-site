@@ -1,0 +1,118 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div class="page-head">
+      <div>
+        <h1>{{ pageId ? 'Редактирование страницы' : 'Новая страница' }}</h1>
+        <p class="text-muted">
+          Блоки редактируются прямо на странице: «+» или «/» — добавить, ⠿ — переставить,
+          Ctrl+Z — отменить, «⚙» у блока — настройки.
+        </p>
+      </div>
+      <div class="page-actions">
+        @if (saved) {
+          <span class="admin-saved">✓ Сохранено</span>
+        }
+        <a routerLink="/admin/pages" class="btn btn--outline">← К списку</a>
+        <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving">
+          {{ saving ? 'Сохраняем…' : 'Сохранить' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else {
+    @if (error) {
+      <p class="admin-error">{{ error }}</p>
+    }
+
+    @if (draftAvailable) {
+      <div class="page-draft">
+        <span class="page-draft__text">Найден несохранённый черновик от {{ draftTimeLabel() }}.</span>
+        <button type="button" class="btn btn--primary btn--small" (click)="restoreDraft()">Восстановить</button>
+        <button type="button" class="btn btn--small" (click)="discardDraft()">Удалить</button>
+      </div>
+    }
+
+    <!-- Параметры страницы: свёрнуто при редактировании, раскрыто у новой -->
+    <details class="page-settings" [open]="!pageId">
+      <summary class="page-settings__summary">
+        <span class="page-settings__title">Параметры страницы</span>
+        <span class="page-settings__hint">
+          {{ title || 'без названия' }}
+          @if (slug) { · /{{ slug }} }
+          · {{ status === 'published' ? 'опубликована' : 'черновик' }}
+        </span>
+      </summary>
+
+      <div class="page-settings__body">
+        <div class="page-side">
+          <h3>Параметры</h3>
+          <label class="field">
+            <span>Название страницы</span>
+            <input class="admin-input" [value]="title" (input)="onTitle($any($event.target).value)" placeholder="Название" />
+          </label>
+          <label class="field">
+            <span>Адрес (slug)</span>
+            <input class="admin-input" [value]="slug" (input)="onSlug($any($event.target).value)" placeholder="naprimer-stranica" />
+          </label>
+          <label class="field">
+            <span>Статус</span>
+            <select class="admin-input" [value]="status" (change)="onStatus($any($event.target).value)">
+              <option value="published">Опубликована</option>
+              <option value="draft">Черновик</option>
+            </select>
+          </label>
+          <div class="field">
+            <span>Доступ</span>
+            <div class="page-access">
+              <button
+                type="button"
+                class="row-opt row-opt--eye"
+                [class.row-opt--eye-all]="accessLevel() === 'all'"
+                [class.row-opt--eye-partial]="accessLevel() === 'partial'"
+                [class.row-opt--eye-none]="accessLevel() === 'none'"
+                [title]="accessText()"
+                (click)="openRolesPicker()"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              <span class="page-access__text">{{ accessText() }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-side">
+          <h3>SEO</h3>
+          <label class="field">
+            <span>Meta title</span>
+            <input class="admin-input" [value]="metaTitle" (input)="onMetaTitle($any($event.target).value)" placeholder="Заголовок для поиска" />
+          </label>
+          <label class="field field--area">
+            <span>Meta description</span>
+            <textarea class="admin-textarea" [value]="metaDescription" (input)="onMetaDescription($any($event.target).value)" rows="3" placeholder="Описание для поиска"></textarea>
+          </label>
+        </div>
+      </div>
+    </details>
+
+    <!-- Визуальный редактор: на всю ширину -->
+    <div class="page-editor">
+      <app-page-canvas
+        [sections]="sections"
+        [forms]="availableForms"
+        (sectionsChange)="onSectionsChange($event)"
+      />
+    </div>
+  }
+
+  @if (rolesPickerOpen) {
+    <app-admin-roles-picker
+      [roles]="roles"
+      [selected]="accessRoles"
+      (applied)="applyRoles($event)"
+      (closed)="closeRolesPicker()"
+    />
+  }
+</section>

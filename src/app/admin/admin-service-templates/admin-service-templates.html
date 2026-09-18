@@ -1,0 +1,130 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div class="tpl-head">
+      <h1>Шаблоны карточек</h1>
+      <div class="tpl-head__actions">
+        <a class="btn btn--outline" routerLink="/admin/services">← Каталог</a>
+        @if (!formOpen) {
+          <button type="button" class="btn btn--primary" (click)="startCreate()">+ Шаблон</button>
+        }
+      </div>
+    </div>
+    <p class="text-muted">
+      Шаблон задаёт состав карточки: какие поля показывать и в каком порядке. Шаблон выбирается в карточке позиции
+      (или используется шаблон по умолчанию для её типа).
+    </p>
+  </div>
+
+  @if (formOpen) {
+    <div class="card">
+      <div class="tpl-form-head">
+        <h3>{{ editingId ? 'Изменить шаблон' : 'Новый шаблон' }}</h3>
+        <div class="tpl-form-head__actions">
+          <button type="button" class="btn btn--outline btn--small" (click)="cancelForm()">← Список шаблонов</button>
+          @if (editingId) {
+            <button type="button" class="btn btn--danger btn--small" (click)="removeCurrent()">Удалить</button>
+          }
+          <button type="button" class="btn btn--primary btn--small" (click)="save()" [disabled]="saving">
+            {{ saving ? 'Сохранение…' : 'Сохранить' }}
+          </button>
+        </div>
+      </div>
+      <label class="tpl-field">
+        <span>Название</span>
+        <input class="admin-input" [value]="formName" (input)="formName = $any($event.target).value" placeholder="Например: Карточка услуги" />
+      </label>
+      <label class="tpl-field">
+        <span>Тип</span>
+        <select class="admin-input" [value]="formKind" (change)="formKind = $any($event.target).value">
+          <option value="service">Услуга</option>
+          <option value="product">Товар</option>
+        </select>
+      </label>
+      <label class="tpl-check">
+        <input type="checkbox" [checked]="formDefault" (change)="formDefault = $any($event.target).checked" />
+        <span>Шаблон по умолчанию для этого типа</span>
+      </label>
+
+      <h4 class="tpl-sub">Поля карточки (порядок сверху вниз)</h4>
+      <div class="tpl-fields">
+        @for (f of editFields; track f.key; let i = $index) {
+          <div class="tpl-field-row">
+            <label class="tpl-check">
+              <input type="checkbox" [checked]="f.on" (change)="toggleField(f.key, $any($event.target).checked)" />
+              <span>{{ fieldLabel(f.key) }}</span>
+            </label>
+            <div class="tpl-field-row__tools">
+              <button type="button" class="btn-icon" title="Выше" (click)="moveField(i, -1)">↑</button>
+              <button type="button" class="btn-icon" title="Ниже" (click)="moveField(i, 1)">↓</button>
+            </div>
+          </div>
+        }
+      </div>
+      @if (saveError) {
+        <p class="admin-error">{{ saveError }}</p>
+      }
+    </div>
+  } @else {
+    @if (error) {
+      <p class="admin-error">{{ error }}</p>
+    }
+    @if (loading) {
+      <p class="text-muted">Загрузка…</p>
+    } @else {
+      <div class="tpl-toolbar">
+        <input
+          class="admin-input tpl-toolbar__search"
+          [value]="filterQ"
+          (input)="onFilterQ($any($event.target).value)"
+          placeholder="Поиск по названию"
+        />
+        <div class="tpl-toolbar__filters">
+          <label class="tpl-sort">
+            <span>Тип:</span>
+            <select class="admin-input" (change)="onFilterKind($any($event.target).value)">
+              <option value="" [selected]="filterKind === ''">Все типы</option>
+              <option value="service" [selected]="filterKind === 'service'">Только услуги</option>
+              <option value="product" [selected]="filterKind === 'product'">Только товары</option>
+            </select>
+          </label>
+          <label class="tpl-sort">
+            <span>Сортировка:</span>
+            <select class="admin-input" (change)="onSortMode($any($event.target).value)">
+              <option value="title" [selected]="sortMode === 'title'">По названию (А–Я)</option>
+              <option value="title_desc" [selected]="sortMode === 'title_desc'">По названию (Я–А)</option>
+              <option value="fields_desc" [selected]="sortMode === 'fields_desc'">По количеству полей (больше)</option>
+              <option value="fields_asc" [selected]="sortMode === 'fields_asc'">По количеству полей (меньше)</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tpl-list">
+          @for (template of visibleTemplates(); track template.id) {
+            <div class="tpl-row">
+              <div class="tpl-row__main">
+                <strong>{{ template.name }}</strong>
+                <span class="tpl-row__kind">{{ template.kind === 'product' ? 'товар' : 'услуга' }}</span>
+                @if (template.is_default) {
+                  <span class="tpl-row__badge">по умолчанию</span>
+                }
+              </div>
+              <span class="tpl-row__fields">
+                {{ template.fields.length }} полей: {{ template.fields[0].key }}…
+              </span>
+              <div class="tpl-row__tools">
+                <button type="button" class="btn-icon" title="Изменить" (click)="startEdit(template)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+                </button>
+              </div>
+            </div>
+          } @empty {
+            <p class="text-muted">
+              {{ templates.length ? 'Ничего не найдено. Измените фильтр или запрос.' : 'Шаблонов нет.' }}
+            </p>
+          }
+        </div>
+      </div>
+    }
+  }
+</section>

@@ -1,0 +1,9 @@
+@if (loading) {
+  <p class="text-muted">Загрузка…</p>
+} @else if (services.length) {
+  <div class="services-grid">
+    @for (service of services; track service.id) {
+      <app-service-card [service]="service" />
+    }
+  </div>
+}

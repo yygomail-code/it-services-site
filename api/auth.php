@@ -42,7 +42,7 @@ switch ($action) {
         }
 
         try {
-            $stmt = db()->prepare('SELECT * FROM users WHERE login = ? AND active = 1');
+            $stmt = db()->prepare('SELECT * FROM users WHERE login = ?');
             $stmt->execute([$login]);
             $user = $stmt->fetch();
         } catch (Throwable $e) {
@@ -56,9 +56,13 @@ switch ($action) {
             respondError(401, 'Неверный логин или пароль');
         }
 
-        if ($user['role'] === 'client') {
-            respondError(403, 'Учётная запись клиента не имеет доступа к админке');
+        if ((int) $user['active'] !== 1) {
+            usleep(300000);
+            respondError(403, 'Учётная запись заблокирована. Обратитесь к администратору');
         }
+
+        // Клиенты входят на сайт (личный кабинет); доступ к админке
+        // закрыт гардами на фронте и requireRole в API.
 
         startSession();
         session_regenerate_id(true);
@@ -72,13 +76,7 @@ switch ($action) {
         }
 
         respondOk([
-            'user' => [
-                'id' => (int) $user['id'],
-                'login' => $user['login'],
-                'email' => $user['email'],
-                'role' => $user['role'],
-                'full_name' => $user['full_name'],
-            ],
+            'user' => currentUser(),
             'csrf' => $_SESSION['csrf'],
         ]);
         break;

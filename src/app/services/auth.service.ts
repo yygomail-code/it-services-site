@@ -1,6 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, switchMap, of } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 import { User } from '../models/admin.model';
 
 interface AuthResponse {
@@ -16,6 +17,8 @@ export class AuthService {
   private csrf = '';
 
   readonly user = signal<User | null>(null);
+  /** Стало true после проверки сессии (fetchMe) — до этого роль неизвестна. */
+  readonly ready = signal(false);
   readonly isAdmin = computed(() => this.user()?.role === 'admin');
   readonly isManager = computed(() => {
     const role = this.user()?.role;
@@ -52,6 +55,8 @@ export class AuthService {
             this.csrf = res.csrf;
           }
         }),
+        // Сессия проверена (успех или ошибка) — можно показывать элементы по ролям
+        finalize(() => this.ready.set(true)),
       );
   }
 

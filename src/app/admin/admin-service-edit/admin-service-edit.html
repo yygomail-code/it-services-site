@@ -1,0 +1,267 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div class="service-head">
+      <h1>{{ isNew ? 'Новая позиция' : (form.title || 'Позиция') }}</h1>
+      <div class="service-head__actions">
+        <a class="btn btn--outline" routerLink="/admin/services">← Каталог</a>
+        @if (!isNew) {
+          <button type="button" class="btn btn--danger" (click)="remove()">Удалить</button>
+        }
+        <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving">
+          {{ saving ? 'Сохранение…' : 'Сохранить' }}
+        </button>
+      </div>
+    </div>
+    <p class="text-muted">
+      Цена и единица измерения, описания и медиа. Для календаря — длительность и буферы до/после. Флаги включают
+      запись, продажу, комментарии и рейтинг для этой позиции.
+    </p>
+  </div>
+
+  @if (error) {
+    <p class="admin-error">{{ error }}</p>
+  }
+  @if (saveError) {
+    <p class="admin-error">{{ saveError }}</p>
+  }
+  @if (saved) {
+    <p class="admin-saved">✓ Сохранено</p>
+  }
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else {
+    <div class="card service-card">
+      <h3>Основное</h3>
+      <label class="service-field">
+        <span>Название</span>
+        <input class="admin-input" [value]="form.title" (input)="onTitle($any($event.target).value)" placeholder="Например: Стрижка мужская" />
+      </label>
+      <label class="service-field">
+        <span>Адрес (URL)</span>
+        <div class="service-field__row">
+          <input class="admin-input" [value]="form.slug" (input)="onSlug($any($event.target).value)" placeholder="strizhka-muzhskaya" />
+          <button type="button" class="btn btn--outline btn--small" (click)="makeSlug()">Из названия</button>
+        </div>
+      </label>
+      <div class="service-field">
+        <span>Тип</span>
+        <div class="service-radio-row">
+          <label class="service-check">
+            <input type="radio" name="kind" [checked]="form.kind === 'service'" (change)="set('kind', 'service')" />
+            <span>Услуга</span>
+          </label>
+          <label class="service-check">
+            <input type="radio" name="kind" [checked]="form.kind === 'product'" (change)="set('kind', 'product')" />
+            <span>Товар</span>
+          </label>
+          <label class="service-check service-check--ml">
+            <input type="checkbox" [checked]="form.active" (change)="set('active', $any($event.target).checked)" />
+            <span>Показывать на сайте</span>
+          </label>
+          <label class="service-field service-field--inline">
+            <span>Порядок</span>
+            <input class="admin-input" type="number" [value]="form.sort_order" (input)="onNumber('sort_order', $any($event.target).value)" />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card service-card">
+      <h3>Цена и время</h3>
+      <div class="service-grid">
+        <label class="service-field">
+          <span>Стоимость, ₽</span>
+          <input class="admin-input" type="number" min="0" [value]="form.price ?? ''" (input)="onPrice($any($event.target).value)" placeholder="пусто — по запросу" />
+        </label>
+        <label class="service-field">
+          <span>Цена</span>
+          <select class="admin-input" [value]="form.price_prefix" (change)="set('price_prefix', $any($event.target).value)">
+            <option value="none">Точная</option>
+            <option value="from">От</option>
+          </select>
+        </label>
+        <label class="service-field">
+          <span>Примечание к цене</span>
+          <input class="admin-input" [value]="form.price_note ?? ''" (input)="set('price_note', $any($event.target).value)" placeholder="в месяц, за м²…" />
+        </label>
+        <label class="service-field">
+          <span>Единица</span>
+          <select class="admin-input" [value]="form.unit" (change)="set('unit', $any($event.target).value)">
+            <option value="piece">Штучно</option>
+            <option value="time">Временной промежуток</option>
+          </select>
+        </label>
+        <label class="service-field">
+          <span>Длительность, мин</span>
+          <input class="admin-input" type="number" min="5" [value]="form.duration_min" (input)="onNumber('duration_min', $any($event.target).value)" />
+        </label>
+        <label class="service-field">
+          <span>Буфер до, мин</span>
+          <input class="admin-input" type="number" min="0" [value]="form.buffer_before_min" (input)="onNumber('buffer_before_min', $any($event.target).value)" />
+        </label>
+        <label class="service-field">
+          <span>Буфер после, мин</span>
+          <input class="admin-input" type="number" min="0" [value]="form.buffer_after_min" (input)="onNumber('buffer_after_min', $any($event.target).value)" />
+        </label>
+      </div>
+      <p class="text-muted service-hint">
+        Буферы учитываются при расчёте свободного времени в календаре: время до и после оказания услуги резервируется.
+      </p>
+    </div>
+
+    <div class="card service-card">
+      <h3>Описания</h3>
+      <label class="service-field">
+        <span>Короткое описание</span>
+        <textarea class="admin-textarea" rows="2" [value]="form.short_description ?? ''" (input)="set('short_description', $any($event.target).value)" placeholder="Показывается в карточке и списке"></textarea>
+      </label>
+      <label class="service-field">
+        <span>Полное описание</span>
+        <textarea class="admin-textarea" rows="8" [value]="form.full_description ?? ''" (input)="set('full_description', $any($event.target).value)" placeholder="Можно с HTML: <p>, <ul>, <h3>…"></textarea>
+      </label>
+    </div>
+
+    <div class="card service-card">
+      <h3>Медиа (галерея)</h3>
+      <div class="service-media">
+        @for (m of media; track m.url; let i = $index) {
+          <div class="service-media__item" [class.service-media__item--cover]="m.is_cover">
+            <img [src]="m.url" alt="" />
+            <div class="service-media__tools">
+              <button type="button" class="btn-icon" title="Влево" (click)="moveMedia(i, -1)">←</button>
+              <button type="button" class="btn-icon" title="Обложка" (click)="makeCover(i)">★</button>
+              <button type="button" class="btn-icon" title="Вправо" (click)="moveMedia(i, 1)">→</button>
+              <button type="button" class="btn-icon btn-icon--danger" title="Убрать" (click)="removeMedia(i)">✕</button>
+            </div>
+            @if (m.is_cover) {
+              <span class="service-media__badge">обложка</span>
+            }
+          </div>
+        }
+        <button type="button" class="service-media__add" (click)="openPicker()">+ Из медиатеки</button>
+      </div>
+    </div>
+
+    <div class="card service-card">
+      <h3>Группа и шаблон карточки</h3>
+      <div class="service-grid">
+        <label class="service-field">
+          <span>Группа каталога</span>
+          <select class="admin-input" (change)="set('category_id', +$any($event.target).value || null)">
+            <option value="0" [selected]="!form.category_id">— без группы —</option>
+            @for (c of categoryOptions(); track c.id) {
+              <option [value]="c.id" [selected]="c.id === form.category_id">{{ c.title }}</option>
+            }
+          </select>
+        </label>
+        <label class="service-field">
+          <span>Шаблон карточки</span>
+          <select class="admin-input" (change)="set('template_id', +$any($event.target).value || null)">
+            <option value="0" [selected]="!form.template_id">— по умолчанию —</option>
+            @for (t of templates; track t.id) {
+              <option [value]="t.id" [selected]="t.id === form.template_id">{{ t.name }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <p class="text-muted service-hint">Шаблоны задают, какие поля показывать в карточке услуги и в каком порядке. Настроить: «Шаблоны карточек».</p>
+    </div>
+
+    <div class="card service-card">
+      <h3>Адрес оказания</h3>
+      <div class="service-grid">
+        <label class="service-field">
+          <span>Адрес</span>
+          <input class="admin-input" [value]="form.address ?? ''" (input)="set('address', $any($event.target).value)" placeholder="Краснодар, ул. Красная, 1" />
+        </label>
+        <label class="service-field">
+          <span>Широта</span>
+          <input class="admin-input" [value]="form.map_lat ?? ''" (input)="set('map_lat', $any($event.target).value === '' ? null : +$any($event.target).value)" placeholder="45.0355" />
+        </label>
+        <label class="service-field">
+          <span>Долгота</span>
+          <input class="admin-input" [value]="form.map_lng ?? ''" (input)="set('map_lng', $any($event.target).value === '' ? null : +$any($event.target).value)" placeholder="38.9753" />
+        </label>
+      </div>
+      <p class="text-muted service-hint">Если координаты не указаны, карта строится по адресу.</p>
+    </div>
+
+    <div class="card service-card">
+      <h3>Флаги и оплата</h3>
+      <div class="service-flags">
+        <label class="service-check">
+          <input type="checkbox" [checked]="form.booking_enabled" (change)="set('booking_enabled', $any($event.target).checked)" />
+          <span>Доступна запись через календарь</span>
+        </label>
+        <label class="service-check">
+          <input type="checkbox" [checked]="form.shop_enabled" (change)="set('shop_enabled', $any($event.target).checked)" />
+          <span>Доступна продажа через магазин</span>
+        </label>
+        <label class="service-check">
+          <input type="checkbox" [checked]="form.comments_enabled" (change)="set('comments_enabled', $any($event.target).checked)" />
+          <span>Комментарии включены</span>
+        </label>
+        <label class="service-check">
+          <input type="checkbox" [checked]="form.rating_enabled" (change)="set('rating_enabled', $any($event.target).checked)" />
+          <span>Рейтинг включён</span>
+        </label>
+        <label class="service-check">
+          <input type="checkbox" [checked]="form.auto_confirm" (change)="set('auto_confirm', $any($event.target).checked)" />
+          <span>Автоподтверждение брони (иначе подтверждает менеджер)</span>
+        </label>
+      </div>
+      <div class="service-flags service-flags--mt">
+        <label class="service-check">
+          <input type="checkbox" [checked]="form.prepay" (change)="set('prepay', $any($event.target).checked)" />
+          <span>Предоплата</span>
+        </label>
+        <label class="service-check">
+          <input type="checkbox" [checked]="form.postpay" (change)="set('postpay', $any($event.target).checked)" />
+          <span>Постоплата</span>
+        </label>
+      </div>
+      <div class="service-flags service-flags--mt">
+        @for (m of paymentMethods; track m.value) {
+          <label class="service-check">
+            <input type="checkbox" [checked]="hasMethod(m.value)" (change)="toggleMethod(m.value, $any($event.target).checked)" />
+            <span>{{ m.label }}</span>
+          </label>
+        }
+      </div>
+    </div>
+
+    <div class="card service-card">
+      <h3>Доступ</h3>
+      <div class="service-access">
+        <span>Кто видит позицию: <strong>{{ rolesLabel() }}</strong></span>
+        <button type="button" class="btn btn--outline btn--small" (click)="openRoles()">Изменить доступ</button>
+      </div>
+    </div>
+
+    <div class="card service-card">
+      <h3>SEO</h3>
+      <label class="service-field">
+        <span>Title</span>
+        <input class="admin-input" [value]="form.meta_title ?? ''" (input)="set('meta_title', $any($event.target).value)" />
+      </label>
+      <label class="service-field">
+        <span>Description</span>
+        <textarea class="admin-textarea" rows="2" [value]="form.meta_description ?? ''" (input)="set('meta_description', $any($event.target).value)"></textarea>
+      </label>
+    </div>
+  }
+</section>
+
+@if (rolesPickerOpen) {
+  <app-admin-roles-picker
+    [roles]="roles"
+    [selected]="form.roles ?? null"
+    (applied)="applyRoles($event)"
+    (closed)="closeRoles()"
+  />
+}
+
+@if (pickerOpen) {
+  <app-admin-media-picker (pick)="onPick($event)" (closed)="closePicker()" />
+}

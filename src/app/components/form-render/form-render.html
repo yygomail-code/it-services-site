@@ -1,0 +1,73 @@
+@if (loading) {
+  <p class="text-muted">Загрузка формы…</p>
+} @else if (error) {
+  <p class="text-muted">{{ error }}</p>
+} @else if (form) {
+  <div class="form-render">
+    <h3 class="form-render__title">{{ form.title }}</h3>
+    @if (form.description) {
+      <p class="form-render__desc">{{ form.description }}</p>
+    }
+
+    @if (submitted) {
+      <div class="form-render__success">
+        <p>{{ form.success_message }}</p>
+      </div>
+    } @else {
+      <form class="form-render__form" [formGroup]="formGroup" (ngSubmit)="onSubmit()" novalidate>
+        @for (field of form.fields || []; track trackField($index, field)) {
+          <div class="form-render__field">
+            <label class="form-render__label" [for]="'fr-' + form.id + '-' + field.name">
+              {{ field.label }}@if (field.required) { <span class="form-render__req">*</span> }
+            </label>
+
+            @switch (field.field_type) {
+              @case ('textarea') {
+                <textarea
+                  class="form-render__input"
+                  [id]="'fr-' + form.id + '-' + field.name"
+                  [formControlName]="field.name"
+                  [placeholder]="field.placeholder || ''"
+                  rows="4"
+                ></textarea>
+              }
+              @case ('select') {
+                <select
+                  class="form-render__input"
+                  [id]="'fr-' + form.id + '-' + field.name"
+                  [formControlName]="field.name"
+                >
+                  <option value="">{{ field.placeholder || 'Выберите…' }}</option>
+                  @for (opt of field.options || []; track opt) {
+                    <option [value]="opt">{{ opt }}</option>
+                  }
+                </select>
+              }
+              @default {
+                <input
+                  class="form-render__input"
+                  [id]="'fr-' + form.id + '-' + field.name"
+                  [type]="field.field_type === 'email' ? 'email' : field.field_type === 'phone' ? 'tel' : field.field_type === 'url' ? 'url' : 'text'"
+                  [formControlName]="field.name"
+                  [placeholder]="field.placeholder || ''"
+                />
+              }
+            }
+
+            @if (formGroup.get(field.name)?.invalid && formGroup.get(field.name)?.touched) {
+              <p class="form-render__error">Заполните поле корректно</p>
+            }
+          </div>
+        }
+
+        @if (submitError) {
+          <p class="form-render__error form-render__error--global">{{ submitError }}</p>
+        }
+
+        <button type="submit" class="btn btn--primary" [disabled]="sending">
+          {{ sending ? 'Отправка…' : form.submit_label }}
+        </button>
+      </form>
+    }
+  </div>
+}

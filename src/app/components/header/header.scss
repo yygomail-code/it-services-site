@@ -38,6 +38,14 @@
   flex-shrink: 0;
 }
 
+.header__logo-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .header__logo-text {
   font-weight: 700;
   font-size: 0.95rem;
@@ -53,6 +61,11 @@
   font-weight: 400;
   font-size: 0.7rem;
   color: var(--color-muted);
+}
+
+/* Крупнее: увеличенная подпись у логотипа */
+.header__logo-text--large small {
+  font-size: 0.82rem;
 }
 
 .header__nav {
@@ -82,19 +95,6 @@
   border-radius: 8px;
   font-weight: 600 !important;
   transition: background 0.2s !important;
-}
-
-.header__auth {
-  color: var(--color-primary) !important;
-  font-weight: 600 !important;
-  border: 1.5px solid var(--color-primary);
-  padding: 0.45rem 1rem;
-  border-radius: 8px;
-  transition: background 0.2s !important;
-}
-
-.header__auth:hover {
-  background: var(--color-primary-bg) !important;
 }
 
 .header__cta:hover {

@@ -1,13 +1,13 @@
-<div class="cookie-consent" role="dialog" aria-live="polite" aria-label="Уведомление об использовании файлов cookie">
-  <div class="cookie-consent__inner">
-    <p>
-      Мы используем файлы cookie (куки) для корректной работы сайта, сбора статистики посещаемости
-      (Яндекс.Метрика) и улучшения сервиса. Продолжая пользоваться сайтом, вы соглашаетесь
-      с <a routerLink="/policy">политикой обработки персональных данных</a>.
-    </p>
-    <div class="cookie-consent__actions">
-      <button type="button" class="btn btn--primary" (click)="accept()">Принять</button>
-      <button type="button" class="btn btn--ghost" (click)="decline()">Отклонить</button>
+@if (visible) {
+  <div class="cookie-consent" role="dialog" aria-live="polite" aria-label="Уведомление об использовании файлов cookie">
+    <div class="cookie-consent__inner">
+      <p class="cookie-consent__text">
+        Мы собираем файлы cookie и применяем рекомендательные технологии.
+      </p>
+      <div class="cookie-consent__actions">
+        <a routerLink="/cookie-policy" class="cookie-consent__link">Подробнее</a>
+        <button type="button" class="btn btn--primary" (click)="accept()">Принять</button>
+      </div>
     </div>
   </div>
-</div>
+}

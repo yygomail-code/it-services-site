@@ -1,0 +1,70 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div class="fb-head">
+      <h1>Подвал</h1>
+      <div class="fb-actions">
+        @if (saved) {
+          <span class="admin-saved">✓ Сохранено</span>
+        }
+        <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving">
+          {{ saving ? 'Сохранение…' : 'Сохранить' }}
+        </button>
+      </div>
+    </div>
+    <p class="text-muted">Нижняя строка сайта: копирайт и ссылки</p>
+  </div>
+
+  @if (error) {
+    <p class="admin-error">{{ error }}</p>
+  }
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else {
+    <div class="fb-form">
+      <div class="fb-card">
+        <h3>Копирайт</h3>
+        <p class="fb-hint">Показывается на сайте, если заполнен текст. Пусто — строка скрыта.</p>
+        <div class="fb-row">
+          <input
+            class="admin-input"
+            [value]="copyrightText"
+            (input)="onCopyright($any($event.target).value)"
+            placeholder="© 2026 Литвинов Антон. Все права защищены."
+          />
+          <button
+            type="button"
+            class="fb-row__opt"
+            [class.fb-row__opt--on]="copyrightLarge"
+            [title]="copyrightLarge ? 'Обычный размер' : 'Крупнее'"
+            (click)="toggleCopyrightLarge(!copyrightLarge)"
+          >A</button>
+        </div>
+      </div>
+
+      <div class="fb-card">
+        <div class="fb-card__head">
+          <h3>Ссылки в подвале</h3>
+          <button type="button" class="btn btn--small" (click)="addLink()">+ Ссылка</button>
+        </div>
+
+        @if (links.length === 0) {
+          <p class="text-muted">Ссылок нет. Добавьте ссылку (например, «Политика конфиденциальности»).</p>
+        }
+
+        <div class="fb-links">
+          @for (link of links; track trackLink($index); let i = $index) {
+            <div class="fb-link">
+              <app-admin-link-editor [link]="link" [pages]="pages" [catalog]="linkTargets" />
+              <div class="fb-link__tools">
+                <button type="button" class="btn-icon" title="Вверх" (click)="moveLink(i, -1)">↑</button>
+                <button type="button" class="btn-icon" title="Вниз" (click)="moveLink(i, 1)">↓</button>
+              </div>
+              <button type="button" class="btn-icon btn-icon--danger" title="Удалить" (click)="removeLink(i)">✕</button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</section>

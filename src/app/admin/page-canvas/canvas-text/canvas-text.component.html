@@ -1,0 +1,105 @@
+<div class="canvas-text" #wrap>
+  <div #host class="canvas-text__host"></div>
+
+  @if (bubbleOpen && variant !== 'list') {
+    <div class="canvas-text__bubble" [style.left.px]="bubbleLeft" [style.top.px]="bubbleTop">
+      @if (!linkOpen) {
+        <button
+          type="button"
+          class="canvas-text__btn"
+          [class.canvas-text__btn--active]="isActive('bold')"
+          title="Жирный"
+          (mousedown)="$event.preventDefault()"
+          (click)="toggleBold()"
+        ><b>Ж</b></button>
+        <button
+          type="button"
+          class="canvas-text__btn"
+          [class.canvas-text__btn--active]="isActive('italic')"
+          title="Курсив"
+          (mousedown)="$event.preventDefault()"
+          (click)="toggleItalic()"
+        ><i>К</i></button>
+        <button
+          type="button"
+          class="canvas-text__btn"
+          [class.canvas-text__btn--active]="isActive('underline')"
+          title="Подчёркнутый"
+          (mousedown)="$event.preventDefault()"
+          (click)="toggleUnderline()"
+        ><u>Ч</u></button>
+
+        @if (variant === 'text') {
+          <span class="canvas-text__sep"></span>
+          <button
+            type="button"
+            class="canvas-text__btn"
+            [class.canvas-text__btn--active]="isHeading(2)"
+            title="Заголовок 2"
+            (mousedown)="$event.preventDefault()"
+            (click)="setHeading(2)"
+          >H2</button>
+          <button
+            type="button"
+            class="canvas-text__btn"
+            [class.canvas-text__btn--active]="isHeading(3)"
+            title="Заголовок 3"
+            (mousedown)="$event.preventDefault()"
+            (click)="setHeading(3)"
+          >H3</button>
+          <button
+            type="button"
+            class="canvas-text__btn"
+            title="Обычный текст"
+            (mousedown)="$event.preventDefault()"
+            (click)="setParagraph()"
+          >¶</button>
+          <span class="canvas-text__sep"></span>
+          <button
+            type="button"
+            class="canvas-text__btn"
+            [class.canvas-text__btn--active]="editor?.isActive('bulletList')"
+            title="Маркированный список"
+            (mousedown)="$event.preventDefault()"
+            (click)="toggleBulletList()"
+          >•</button>
+          <button
+            type="button"
+            class="canvas-text__btn"
+            [class.canvas-text__btn--active]="editor?.isActive('orderedList')"
+            title="Нумерованный список"
+            (mousedown)="$event.preventDefault()"
+            (click)="toggleOrderedList()"
+          >1.</button>
+        }
+
+        <span class="canvas-text__sep"></span>
+        <button
+          type="button"
+          class="canvas-text__btn"
+          [class.canvas-text__btn--active]="isActive('link')"
+          title="Ссылка"
+          (mousedown)="$event.preventDefault()"
+          (click)="openLink()"
+        >🔗</button>
+        <button
+          type="button"
+          class="canvas-text__btn"
+          title="Убрать форматирование"
+          (mousedown)="$event.preventDefault()"
+          (click)="clearFormat()"
+        >✕</button>
+      } @else {
+        <input
+          class="canvas-text__link"
+          [value]="linkValue"
+          (input)="onLinkInput($event)"
+          placeholder="https://…"
+          (keydown.enter)="applyLink()"
+          (keydown.escape)="cancelLink()"
+        />
+        <button type="button" class="canvas-text__btn canvas-text__btn--ok" title="Применить" (mousedown)="$event.preventDefault()" (click)="applyLink()">ОК</button>
+      }
+    </div>
+  }
+</div>

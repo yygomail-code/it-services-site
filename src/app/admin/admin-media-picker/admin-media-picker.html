@@ -1,0 +1,29 @@
+<div class="picker" (click)="close()">
+  <div class="picker__dialog" role="dialog" aria-modal="true" aria-label="Выбор из медиатеки" (click)="$event.stopPropagation()">
+    <div class="picker__head">
+      <h3>Выбор из медиатеки</h3>
+      <button type="button" class="picker__close" title="Закрыть" (click)="close()">✕</button>
+    </div>
+
+    @if (loading) {
+      <p class="text-muted">Загрузка…</p>
+    } @else if (error) {
+      <p class="admin-error">{{ error }}</p>
+    } @else if (items.length === 0) {
+      <p class="text-muted">Медиатека пуста. Загрузите изображения в разделе «Медиатека».</p>
+    } @else {
+      <div class="picker__grid">
+        @for (item of items; track item.id) {
+          <button
+            type="button"
+            class="picker__item"
+            [title]="item.title || item.file_name"
+            (click)="choose(item)"
+          >
+            <img [src]="item.url" [alt]="item.alt || item.title || item.file_name" loading="lazy" />
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>

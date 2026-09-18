@@ -1,8 +1,16 @@
 <section class="admin-section">
   <div class="admin-section__header">
     <div>
-      <h1>Настройки</h1>
-      <p class="text-muted">Ключевые настройки сайта: контакты и главные тексты</p>
+      <h1>Контакты</h1>
+      <p class="text-muted">Контакты, которые показываются на сайте</p>
+    </div>
+    <div class="settings-actions">
+      @if (saved) {
+        <span class="admin-saved">✓ Сохранено</span>
+      }
+      <button type="button" class="btn btn--primary" (click)="saveAll()" [disabled]="saving">
+        {{ saving ? 'Сохранение…' : 'Сохранить всё' }}
+      </button>
     </div>
   </div>
 
@@ -13,32 +21,82 @@
   @if (loading) {
     <p class="text-muted">Загрузка…</p>
   } @else {
-    <div class="settings-list">
-      @for (item of settings; track item.key) {
-        <div class="settings-item">
-          <div class="settings-item__head">
-            <label class="settings-item__label">{{ item.label }}</label>
-            <div class="settings-item__actions">
-              @if (savedKey === item.key) {
-                <span class="saved">✓ Сохранено</span>
+    <div class="settings-form">
+      <div class="settings-list">
+        @for (item of settings; track item.key) {
+          <div
+            class="settings-item"
+            [class.settings-item--invalid]="item.error"
+            [class.settings-item--area]="item.type === 'textarea'"
+          >
+            <div class="settings-item__row">
+              <label class="settings-item__label" [for]="'set-' + item.key">{{ item.label }}</label>
+
+              @switch (item.type) {
+                @case ('phone') {
+                  <input
+                    [id]="'set-' + item.key"
+                    class="admin-input settings-item__input"
+                    type="tel"
+                    inputmode="tel"
+                    [value]="item.value"
+                    [maxLength]="item.maxLength"
+                    [placeholder]="item.placeholder"
+                    (input)="onInput(item, $any($event.target).value)"
+                  />
+                }
+                @case ('email') {
+                  <input
+                    [id]="'set-' + item.key"
+                    class="admin-input settings-item__input"
+                    type="email"
+                    inputmode="email"
+                    [value]="item.value"
+                    [maxLength]="item.maxLength"
+                    [placeholder]="item.placeholder"
+                    (input)="onInput(item, $any($event.target).value)"
+                  />
+                }
+                @case ('textarea') {
+                  <textarea
+                    [id]="'set-' + item.key"
+                    class="admin-input settings-item__textarea"
+                    [value]="item.value"
+                    [maxLength]="item.maxLength"
+                    [placeholder]="item.placeholder"
+                    rows="3"
+                    (input)="onInput(item, $any($event.target).value)"
+                  ></textarea>
+                }
+                @default {
+                  <input
+                    [id]="'set-' + item.key"
+                    class="admin-input settings-item__input"
+                    type="text"
+                    [value]="item.value"
+                    [maxLength]="item.maxLength"
+                    [placeholder]="item.placeholder"
+                    (input)="onInput(item, $any($event.target).value)"
+                  />
+                }
               }
-              <button type="button" class="btn btn--small" (click)="save(item)">Сохранить</button>
             </div>
+
+            <p class="settings-item__hint">{{ item.hint }}</p>
+            @if (item.error) {
+              <p class="settings-item__error" role="alert">{{ item.error }}</p>
+            }
           </div>
-          <input
-            class="admin-input settings-item__input"
-            type="text"
-            [value]="item.value"
-            placeholder="Значение"
-            (input)="setValue(item, $any($event.target).value)"
-          />
-        </div>
+        }
+      </div>
+
+      @if (saveError) {
+        <p class="admin-error">{{ saveError }}</p>
       }
     </div>
 
     <p class="text-muted admin-hint">
-      Эти настройки подставляются на сайт из базы данных. Если поле пустое — используется
-      значение по умолчанию из кода.
+      Пустые поля не показываются на сайте. Непустые — проверяются по формату перед сохранением.
     </p>
   }
 </section>

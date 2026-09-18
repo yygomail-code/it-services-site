@@ -1,0 +1,40 @@
+<div class="roles-picker" (click)="close()">
+  <div
+    class="roles-picker__dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Видимость ссылки"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="roles-picker__head">
+      <h3>Видимость ссылки</h3>
+      <button type="button" class="roles-picker__close" title="Закрыть" (click)="close()">✕</button>
+    </div>
+    <p class="roles-picker__hint">
+      Отметьте роли, которым видна ссылка. Если ничего не отмечено — ссылка скрыта для всех.
+    </p>
+
+    <div class="roles-picker__list">
+      @for (role of roles; track role.id) {
+        <label class="roles-picker__item">
+          <input
+            type="checkbox"
+            [checked]="isChecked(role.code)"
+            (change)="toggle(role.code, $any($event.target).checked)"
+          />
+          <span class="roles-picker__title">{{ role.title }}</span>
+          <small class="roles-picker__code">{{ role.code }}</small>
+        </label>
+      } @empty {
+        <p class="text-muted">Ролей нет. Добавьте их в разделе «Роли».</p>
+      }
+    </div>
+
+    <div class="roles-picker__actions">
+      <button type="button" class="btn btn--small" (click)="selectAll()">Все</button>
+      <button type="button" class="btn btn--small" (click)="clearAll()">Ничего</button>
+      <span class="roles-picker__count">отмечено {{ chosen.length }} из {{ roles.length }}</span>
+      <button type="button" class="btn btn--primary" (click)="apply()">Готово</button>
+    </div>
+  </div>
+</div>

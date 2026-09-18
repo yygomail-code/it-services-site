@@ -1,0 +1,42 @@
+.nf {
+  max-width: 640px;
+  padding: 2.5rem 0 3rem;
+}
+
+.nf__code {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+  border-radius: 999px;
+  padding: 0.25rem 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.nf h1 {
+  margin: 0 0 0.6rem;
+}
+
+.nf__text {
+  color: var(--color-muted);
+  margin: 0 0 1.5rem;
+}
+
+.nf__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.nf__home {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+
+.nf__home:hover {
+  text-decoration: underline;
+}

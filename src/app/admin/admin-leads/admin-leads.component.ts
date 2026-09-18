@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AdminService } from '../../services/admin.service';
 import { Lead } from '../../models/admin.model';
 
@@ -9,6 +9,7 @@ import { Lead } from '../../models/admin.model';
 })
 export class AdminLeadsComponent implements OnInit {
   private readonly admin = inject(AdminService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   leads: Lead[] = [];
   total = 0;
@@ -62,10 +63,12 @@ export class AdminLeadsComponent implements OnInit {
           this.total = res.total;
           this.pages = res.pages;
           this.loading = false;
+          this.cdr.markForCheck();
         },
         error: () => {
           this.error = 'Не удалось загрузить лиды';
           this.loading = false;
+          this.cdr.markForCheck();
         },
       });
   }
@@ -75,6 +78,7 @@ export class AdminLeadsComponent implements OnInit {
       next: (res) => {
         this.stats = res.stats;
         this.totalCount = res.total;
+        this.cdr.markForCheck();
       },
       error: () => {},
     });

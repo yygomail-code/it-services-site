@@ -4,91 +4,212 @@
       <h1>Пользователи</h1>
       <p class="text-muted">Учётные записи админки: клиент, менеджер, админ</p>
     </div>
-    <button type="button" class="btn btn--primary" (click)="openCreate()">+ Добавить</button>
+    @if (!formOpen) {
+      <button type="button" class="btn btn--primary" (click)="openCreate()">+ Добавить</button>
+    }
   </div>
 
   @if (error) {
     <p class="admin-error">{{ error }}</p>
   }
 
-  @if (showCreate) {
+  @if (formOpen) {
     <div class="user-form card">
-      <h2>Новый пользователь</h2>
-      <div class="user-form__grid">
-        <input class="admin-input" type="text" placeholder="Логин *" [(ngModel)]="newLogin" />
-        <input class="admin-input" type="text" placeholder="Имя" [(ngModel)]="newName" />
-        <input class="admin-input" type="email" placeholder="Email" [(ngModel)]="newEmail" />
-        <input class="admin-input" type="password" placeholder="Пароль *" [(ngModel)]="newPassword" />
-        <select class="admin-input" [(ngModel)]="newRole">
-          <option value="client">Клиент</option>
-          <option value="manager">Менеджер</option>
-          <option value="admin">Админ</option>
-        </select>
+      <div class="user-form__head">
+        <h2>{{ editingId ? 'Редактирование: ' + (editingUser?.login || '') : 'Новый пользователь' }}</h2>
+        <div class="user-form__head-actions">
+          @if (saved) {
+            <span class="admin-saved">✓ Сохранено</span>
+          }
+          <button type="button" class="btn btn--outline" (click)="closeForm()">← Список пользователей</button>
+          <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving">
+            {{ saving ? 'Сохранение…' : (editingId ? 'Сохранить' : 'Создать') }}
+          </button>
+        </div>
       </div>
-      @if (createError) {
-        <p class="admin-error">{{ createError }}</p>
+
+      @if (formIsSystem) {
+        <p class="user-form__hint">
+          Системная учётная запись: заблокировать, сменить роль и удалить нельзя. Логин, пароль и профиль менять можно.
+        </p>
       }
-      <div class="user-form__actions">
-        <button type="button" class="btn btn--primary" (click)="createUser()">Создать</button>
-        <button type="button" class="btn btn--outline" (click)="showCreate = false">Отмена</button>
+      @if (notified) {
+        <p class="user-form__notified">✉ {{ notified }}</p>
+      }
+      @if (formError) {
+        <p class="admin-error">{{ formError }}</p>
+      }
+
+      <div class="user-form__rows">
+        <label class="user-row">
+          <span class="user-row__label">Логин *</span>
+          <input class="admin-input" [(ngModel)]="form.login" placeholder="login" />
+        </label>
+
+        <div class="user-row">
+          <span class="user-row__label">Пароль{{ editingId ? '' : ' *' }}</span>
+          <input
+            class="admin-input"
+            type="text"
+            [(ngModel)]="form.password"
+            [placeholder]="editingId ? 'Оставьте пустым — не менять' : 'Минимум 6 символов'"
+          />
+          <button type="button" class="btn btn--outline" (click)="generatePassword()">Сгенерировать</button>
+        </div>
+
+        <label class="user-row">
+          <span class="user-row__label">Роль</span>
+          <select class="admin-input" [(ngModel)]="form.role" [disabled]="formIsSystem">
+            @for (role of assignableRoles; track role.id) {
+              <option [value]="role.code">{{ role.title }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="user-row">
+          <span class="user-row__label">Состояние</span>
+          <select class="admin-input" [(ngModel)]="form.active" [disabled]="formIsSystem">
+            <option [ngValue]="1">Активен — может войти в систему</option>
+            <option [ngValue]="0">Заблокирован — вход запрещён</option>
+          </select>
+        </label>
+
+        <label class="user-row">
+          <span class="user-row__label">Фамилия</span>
+          <input class="admin-input" [(ngModel)]="form.last_name" placeholder="Иванов" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Имя</span>
+          <input class="admin-input" [(ngModel)]="form.first_name" placeholder="Иван" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Отчество</span>
+          <input class="admin-input" [(ngModel)]="form.middle_name" placeholder="Иванович" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Дата рождения</span>
+          <input class="admin-input" type="date" [(ngModel)]="form.birth_date" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Страна</span>
+          <input class="admin-input" [(ngModel)]="form.country" placeholder="Россия" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Регион</span>
+          <input class="admin-input" [(ngModel)]="form.region" placeholder="Краснодарский край" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Город</span>
+          <input class="admin-input" [(ngModel)]="form.city" placeholder="Краснодар" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Адрес</span>
+          <input class="admin-input" [(ngModel)]="form.address" placeholder="ул. Красная, д. 1, офис 10" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Телефон</span>
+          <input class="admin-input" type="tel" [(ngModel)]="form.phone" placeholder="+7 900 000-00-00" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Почта</span>
+          <input class="admin-input" type="email" [(ngModel)]="form.email" placeholder="name@example.ru" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Макс</span>
+          <input class="admin-input" [(ngModel)]="form.max_link" placeholder="max.ru/username или телефон" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Телеграм</span>
+          <input class="admin-input" [(ngModel)]="form.telegram" placeholder="@username или ссылка" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Ватсап</span>
+          <input class="admin-input" [(ngModel)]="form.whatsapp" placeholder="+7 900 000-00-00" />
+        </label>
+        <label class="user-row">
+          <span class="user-row__label">Сайт</span>
+          <input class="admin-input" [(ngModel)]="form.site" placeholder="https://example.ru" />
+        </label>
+
+        <div class="user-row">
+          <span class="user-row__label">Аватарка</span>
+          <div class="user-avatar">
+            @if (avatarUrl) {
+              <img class="user-avatar__img" [src]="avatarUrl" alt="Аватар" />
+            } @else {
+              <span class="user-avatar__empty">Нет</span>
+            }
+            <label class="btn btn--outline btn--small user-avatar__upload">
+              {{ uploading ? 'Загрузка…' : (avatarUrl ? 'Заменить' : 'Загрузить с устройства') }}
+              <input type="file" accept="image/*" (change)="onAvatarSelected($event)" [disabled]="uploading" hidden />
+            </label>
+            @if (avatarUrl) {
+              <button type="button" class="btn btn--small btn--danger" (click)="removeAvatar()">Убрать</button>
+            }
+            @if (avatarError) {
+              <span class="admin-error">{{ avatarError }}</span>
+            }
+          </div>
+        </div>
+
+        <label class="user-row user-row--area">
+          <span class="user-row__label">Комментарий</span>
+          <textarea class="admin-textarea" [(ngModel)]="form.admin_comment" rows="3" placeholder="Служебная заметка"></textarea>
+        </label>
       </div>
     </div>
   }
 
-  @if (loading) {
-    <p class="text-muted">Загрузка…</p>
-  } @else if (users.length === 0) {
-    <p class="text-muted">Пользователей нет</p>
-  } @else {
-    <div class="users-table">
-      <div class="users-table__head">
-        <span>Пользователь</span>
-        <span>Роль</span>
-        <span>Статус</span>
-        <span>Последний вход</span>
-        <span></span>
-      </div>
+  @if (!formOpen) {
+    @if (loading) {
+      <p class="text-muted">Загрузка…</p>
+    } @else if (users.length === 0) {
+      <p class="text-muted">Пользователей нет</p>
+    } @else {
+      <div class="users-table">
+        <div class="users-table__head">
+          <span>Пользователь</span>
+          <span>Роль</span>
+          <span>Состояние</span>
+          <span>Последний вход</span>
+          <span></span>
+        </div>
 
-      @for (user of users; track user.id) {
-        @if (editingId === user.id) {
-          <div class="users-table__row users-table__row--edit">
-            <span><strong>{{ user.login }}</strong></span>
-            <select class="admin-input" [(ngModel)]="editRole">
-              <option value="client">Клиент</option>
-              <option value="manager">Менеджер</option>
-              <option value="admin">Админ</option>
-            </select>
-            <label class="switch">
-              <input type="checkbox" [(ngModel)]="editActive" />
-              <span>Активен</span>
-            </label>
-            <input class="admin-input" type="password" placeholder="Новый пароль (опц.)" [(ngModel)]="editPassword" />
-            <div class="users-table__actions">
-              @if (editError) {
-                <span class="admin-error">{{ editError }}</span>
-              }
-              <button type="button" class="btn btn--small" (click)="saveEdit(user)">Сохранить</button>
-              <button type="button" class="btn btn--small" (click)="cancelEdit()">Отмена</button>
-            </div>
-          </div>
-        } @else {
+        @for (user of users; track user.id) {
           <div class="users-table__row">
-            <span>
-              <strong>{{ user.full_name || user.login }}</strong>
-              <small class="text-muted">{{ user.login }}{{ user.email ? ' · ' + user.email : '' }}</small>
+            <span class="user-cell">
+              <span class="user-cell__avatar">
+                @if (user.avatar_url) {
+                  <img [src]="user.avatar_url" alt="" loading="lazy" />
+                } @else {
+                  {{ user.login.charAt(0).toUpperCase() }}
+                }
+              </span>
+              <span class="user-cell__text">
+                <strong>{{ user.full_name || user.login }}</strong>
+                <small class="text-muted">{{ user.login }}{{ user.email ? ' · ' + user.email : '' }}</small>
+              </span>
             </span>
-            <span class="user-role">{{ roles[user.role] ?? user.role }}</span>
-            <span [class.text-muted]="user.active !== 1" [style.color]="user.active === 1 ? 'var(--color-success)' : 'var(--color-danger)'">
-              {{ user.active === 1 ? 'Активен' : 'Отключён' }}
+            <span class="user-role">{{ roleTitle(user.role) }}</span>
+            <span [style.color]="isActive(user) ? 'var(--color-success)' : 'var(--color-danger)'">
+              {{ isActive(user) ? 'Активен' : 'Заблокирован' }}
             </span>
             <span class="text-muted">{{ user.last_login_at || 'никогда' }}</span>
             <div class="users-table__actions">
-              <button type="button" class="btn btn--small" (click)="startEdit(user)">Изменить</button>
-              <button type="button" class="btn btn--small btn--danger" (click)="deleteUser(user)">Удалить</button>
+              <button type="button" class="btn btn--small" (click)="openEdit(user)">Изменить</button>
+              <button
+                type="button"
+                class="btn btn--small btn--danger"
+                (click)="deleteUser(user)"
+                [disabled]="isSystem(user)"
+                [title]="isSystem(user) ? 'Системную учётную запись нельзя удалить' : 'Удалить'"
+              >
+                Удалить
+              </button>
             </div>
           </div>
         }
-      }
-    </div>
+      </div>
+    }
   }
 </section>

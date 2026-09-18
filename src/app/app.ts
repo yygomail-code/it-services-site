@@ -1,6 +1,6 @@
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit, signal } from '@angular/core';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { CookieConsentComponent } from './components/cookie-consent/cookie-consent.component';
@@ -13,15 +13,29 @@ import { ContentService } from './services/content.service';
   styleUrl: './app.scss',
 })
 export class App implements OnInit {
+  private readonly isAdmin = signal(false);
+
   constructor(
     private content: ContentService,
-    @Inject(PLATFORM_ID) private platformId: object,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
-    // На сервере (SSR/prerender) не делаем HTTP-запросы к API
-    if (isPlatformBrowser(this.platformId)) {
-      this.content.loadContent();
-    }
+    // Грузим и при prerender: контент из БД попадает в статический HTML
+    this.content.loadContent();
+
+    this.isAdmin.set(this.isAdminPath(this.router.url));
+    this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe((e) => this.isAdmin.set(this.isAdminPath(e.urlAfterRedirects)));
+  }
+
+  /** На маршрутах админки скрываем шапку/футер/куки-баннер сайта. */
+  isAdminRoute(): boolean {
+    return this.isAdmin();
+  }
+
+  private isAdminPath(url: string): boolean {
+    return url.startsWith('/admin');
   }
 }

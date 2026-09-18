@@ -1,44 +1,40 @@
-import { Component, OnInit } from '@angular/core';
-import { CaseCardComponent } from '../../components/case-card/case-card.component';
-import { LeadFormComponent } from '../../components/lead-form/lead-form.component';
-import { ContentService } from '../../services/content.service';
+import { Component, ChangeDetectorRef, OnInit, inject } from '@angular/core';
+import { PageContentComponent } from '../../components/page-content/page-content.component';
 import { SeoService } from '../../services/seo.service';
-import { PortfolioCase } from '../../models/content.model';
+import { PageService } from '../../services/page.service';
+import { PageBlock, PageSection } from '../../models/admin.model';
 
+/** Портфолио: контент собирается в редакторе страниц (page «portfolio»). */
 @Component({
   selector: 'app-portfolio',
-  imports: [CaseCardComponent, LeadFormComponent],
+  imports: [PageContentComponent],
   templateUrl: './portfolio.html',
-  styleUrl: './portfolio.scss',
 })
 export class PortfolioComponent implements OnInit {
-  cases: PortfolioCase[] = [];
-  categories: string[] = [];
-  activeCategory = 'all';
+  blocks: PageBlock[] | PageSection[] | null = null;
 
-  constructor(
-    private content: ContentService,
-    private seo: SeoService,
-  ) {}
+  private readonly seo = inject(SeoService);
+  private readonly pages = inject(PageService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
-    this.cases = this.content.getCases();
-    this.categories = ['all', ...new Set(this.cases.map((c) => c.category))];
     this.seo.setSeo({
       title: 'Портфолио — примеры работ по сайтам, CRM, БД и автоматизации',
       description:
         'Реальные кейсы: разработка сайтов, внедрение CRM, оптимизация баз данных, автоматизация процессов и интеграции AI. Результаты в цифрах.',
       canonical: '/portfolio',
     });
-  }
 
-  get filteredCases(): PortfolioCase[] {
-    return this.activeCategory === 'all'
-      ? this.cases
-      : this.cases.filter((c) => c.category === this.activeCategory);
-  }
-
-  setCategory(category: string): void {
-    this.activeCategory = category;
+    this.pages.getBySlug('portfolio').subscribe((page) => {
+      if (page?.meta_title) {
+        this.seo.setSeo({
+          title: page.meta_title,
+          description: page.meta_description || '',
+          canonical: '/portfolio',
+        });
+      }
+      this.blocks = page && Array.isArray(page.content) ? page.content : null;
+      this.cdr.markForCheck();
+    });
   }
 }

@@ -1,0 +1,128 @@
+<nav class="breadcrumbs" aria-label="Хлебные крошки">
+  <div class="container">
+    <a routerLink="/">Главная</a> / <span>{{ sectionTitle }}</span>
+  </div>
+</nav>
+
+<section class="section section--tight">
+  <div class="container">
+    <div class="catalog__head">
+      <h1>{{ sectionTitle }}</h1>
+      <p class="catalog__lead">{{ sectionLead }}</p>
+    </div>
+
+    @if (loading) {
+      <p class="text-muted">Загрузка…</p>
+    } @else if (unavailable) {
+      <div class="catalog__stub">
+        <h2>Раздел временно недоступен</h2>
+        <p class="text-muted">Загляните позже или напишите мне — подскажу по услугам.</p>
+        <a class="btn btn--outline" routerLink="/contacts">Связаться</a>
+      </div>
+    } @else if (restricted) {
+      <div class="catalog__stub">
+        <h2>Раздел доступен после входа</h2>
+        <p class="text-muted">Позиции этого раздела видны авторизованным пользователям.</p>
+        <a class="btn btn--primary" routerLink="/login" [queryParams]="{ returnUrl: basePath }">Войти</a>
+      </div>
+    } @else {
+      <form class="catalog__filters" (submit)="onSearchSubmit($event)">
+        <select
+          class="catalog__select"
+          (change)="onCategoryChange($any($event.target).value)"
+          aria-label="Группа"
+        >
+          <option value="" [selected]="!category">Все группы</option>
+          @for (c of categories; track c.id) {
+            <option [value]="c.slug" [selected]="c.slug === category">{{ c.title }} ({{ c.services_count }})</option>
+          }
+        </select>
+
+        <input
+          class="catalog__input"
+          type="search"
+          name="q"
+          [value]="searchInput"
+          (input)="onSearchInput($any($event.target).value)"
+          [placeholder]="searchPlaceholder"
+          [attr.aria-label]="searchPlaceholder"
+        />
+
+        <select
+          class="catalog__select"
+          [value]="sort"
+          (change)="onSortChange($any($event.target).value)"
+          aria-label="Сортировка"
+        >
+          <option value="">По порядку</option>
+          <option value="price_asc">Сначала дешёвые</option>
+          <option value="price_desc">Сначала дорогие</option>
+          <option value="title">По названию</option>
+          <option value="rating">По рейтингу</option>
+        </select>
+
+        @if (q || category || sort) {
+          <button class="btn btn--outline btn--small" type="button" (click)="clearFilters()">Сбросить</button>
+        }
+      </form>
+
+      @if (items.length) {
+        <div class="catalog__meta">Показано {{ fromLabel() }}–{{ toLabel() }} из {{ total }}</div>
+
+        <div class="catalog__grid">
+          @for (item of items; track item.id) {
+            <app-service-card [service]="item" />
+          }
+        </div>
+
+        @if (pages > 1) {
+          <nav class="catalog__pagination" aria-label="Страницы каталога">
+            @if (page > 1) {
+              <a
+                class="catalog__page"
+                [routerLink]="basePath"
+                [queryParams]="{ page: page - 1 }"
+                queryParamsHandling="merge"
+              >
+                ← Назад
+              </a>
+            }
+            @for (p of pageNumbers(); track p) {
+              <a
+                class="catalog__page"
+                [class.catalog__page--active]="p === page"
+                [routerLink]="basePath"
+                [queryParams]="{ page: p }"
+                queryParamsHandling="merge"
+              >
+                {{ p }}
+              </a>
+            }
+            @if (page < pages) {
+              <a
+                class="catalog__page"
+                [routerLink]="basePath"
+                [queryParams]="{ page: page + 1 }"
+                queryParamsHandling="merge"
+              >
+                Вперёд →
+              </a>
+            }
+          </nav>
+        }
+      } @else {
+        <div class="catalog__stub">
+          <h2>Ничего не найдено</h2>
+          <p class="text-muted">Попробуйте изменить запрос или посмотрите всё в разделе.</p>
+          <a class="btn btn--outline" [routerLink]="basePath">{{ allLabel }}</a>
+        </div>
+      }
+
+      <div class="catalog__cta">
+        <h2>{{ ctaTitle }}</h2>
+        <p>{{ ctaText }}</p>
+        <a class="btn btn--primary" routerLink="/contacts">Задать вопрос</a>
+      </div>
+    }
+  </div>
+</section>

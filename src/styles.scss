@@ -1,3 +1,5 @@
+@use './styles/site-content';
+
 :root {
   --color-primary: #1877f2;
   --color-primary-dark: #0f5fc4;
@@ -36,7 +38,9 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  /* clip (а не hidden): так же обрезает горизонтальный скролл,
+     но не создаёт scroll-container и не ломает position: sticky в админке */
+  overflow-x: clip;
   overflow-wrap: anywhere;
 }
 
@@ -133,50 +137,7 @@ app-cookie-consent {
 }
 
 .btn {
-  display: inline-block;
-  padding: 0.85rem 1.6rem;
-  border: 0;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: inherit;
-  text-decoration: none;
-  text-align: center;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-}
-
-.btn:active {
-  transform: translateY(1px);
-}
-
-.btn--primary {
-  background: var(--color-primary);
-  color: #fff;
-}
-
-.btn--primary:hover {
-  background: var(--color-primary-dark);
-}
-
-.btn--outline {
-  background: transparent;
-  color: var(--color-primary);
-  border: 2px solid var(--color-primary);
-}
-
-.btn--outline:hover {
-  background: var(--color-primary-bg);
-}
-
-.btn--block {
-  display: block;
-  width: 100%;
-}
-
-.btn--lg {
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
+  @include site-content.btn-styles;
 }
 
 .tag {
@@ -197,4 +158,376 @@ app-cookie-consent {
   .section {
     padding: 2.5rem 0;
   }
+}
+
+/* =====================================================================
+   АДМИНКА: компактная тема
+   Глобальные правила (не scoped), действуют на контент вложенных
+   компонентов админки (router-outlet), у которых своя инкапсуляция.
+   ===================================================================== */
+
+.admin .btn,
+.admin a.btn {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
+
+.admin .btn--small,
+.admin a.btn--small {
+  padding: 0.28rem 0.55rem;
+  font-size: 0.75rem;
+}
+
+.admin .btn--outline,
+.admin a.btn--outline {
+  border-width: 1px;
+}
+
+.admin .admin-input,
+.admin .admin-textarea {
+  padding: 0.42rem 0.6rem;
+  font-size: 0.82rem;
+  border-radius: 6px;
+}
+
+.admin .admin-section__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.15rem 1rem;
+  margin-bottom: 0.6rem;
+}
+
+/* Заголовок с описанием занимает свободное место, кнопки остаются справа */
+.admin .admin-section__header > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Описание под заголовком занимает всю ширину и переносится на новую строку */
+.admin .admin-section__header > p {
+  flex: 1 1 100%;
+}
+
+.admin .admin-section__header > button,
+.admin .admin-section__header > .btn {
+  flex-shrink: 0;
+}
+
+.admin .admin-section__header h1 {
+  font-size: 1.1rem !important;
+  margin: 0;
+}
+
+.admin .admin-section__header p {
+  font-size: 0.78rem;
+  margin: 0.05rem 0 0;
+}
+
+.admin .card {
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.6rem;
+}
+
+.admin .pages-item,
+.admin .form-item {
+  padding: 0.5rem 0.75rem;
+  gap: 0.5rem;
+}
+
+.admin .pages-list,
+.admin .forms-list,
+.admin .leads-list,
+.admin .media-grid {
+  gap: 0.4rem;
+}
+
+.admin .pages-item__title,
+.admin .form-item__title {
+  font-size: 0.88rem;
+}
+
+.admin .pages-item__slug,
+.admin .form-item__num,
+.admin .form-item__meta {
+  font-size: 0.74rem;
+}
+
+.admin .tag {
+  padding: 0.12rem 0.4rem;
+  font-size: 0.68rem;
+}
+
+.admin .stat strong {
+  font-size: 1.05rem;
+}
+
+.admin .stat {
+  padding: 0.35rem 0.7rem;
+  min-width: 68px;
+  border-radius: 8px;
+}
+
+.admin .stat span {
+  font-size: 0.72rem;
+}
+
+.admin .admin-stats,
+.admin .admin-toolbar {
+  margin-bottom: 0.6rem;
+}
+
+.admin .lead__main {
+  padding: 0.5rem 0.7rem;
+}
+
+.admin .lead__name {
+  font-size: 0.88rem;
+}
+
+.admin .lead__phone {
+  font-size: 0.82rem;
+}
+
+.admin .lead__meta {
+  font-size: 0.75rem;
+}
+
+.admin .lead__details {
+  padding: 0.6rem 0.7rem;
+  gap: 0.45rem;
+}
+
+.admin .lead__grid {
+  font-size: 0.8rem;
+}
+
+.admin .users-table__head,
+.admin .users-table__row {
+  padding: 0.45rem 0.7rem;
+}
+
+.admin .users-table__head {
+  font-size: 0.72rem;
+}
+
+.admin .users-table__row {
+  font-size: 0.82rem;
+}
+
+.admin .form-editor,
+.admin .page-form,
+.admin .submissions {
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  gap: 0.8rem;
+}
+
+.admin .form-field,
+.admin .page-block {
+  padding: 0.55rem 0.7rem;
+  gap: 0.5rem;
+}
+
+.admin .form-field__type,
+.admin .page-block__type {
+  font-size: 0.68rem;
+}
+
+.admin .media-card__info {
+  padding: 0.35rem 0.5rem 0.25rem;
+}
+
+.admin .media-card__name {
+  font-size: 0.75rem;
+}
+
+.admin .media-card__meta {
+  font-size: 0.7rem;
+}
+
+.admin .media-card__actions {
+  padding: 0 0.5rem 0.45rem;
+}
+
+.admin .settings-item {
+  padding: 0.55rem 0.75rem;
+  gap: 0.3rem;
+}
+
+.admin .settings-form__actions {
+  margin-top: 0.5rem;
+}
+
+.admin .field span {
+  font-size: 0.7rem;
+}
+
+.admin .field {
+  font-size: 0.82rem;
+}
+
+.admin h1:not(.canvas-text *, .pc-block *) {
+  font-size: 1.1rem !important;
+}
+
+.admin h2:not(.canvas-text *, .pc-block *) {
+  font-size: 1rem;
+}
+
+.admin h3:not(.canvas-text *, .pc-block *) {
+  font-size: 0.92rem;
+}
+
+.admin p:not(.canvas-text *, .pc-block *) {
+  font-size: 0.85rem;
+}
+
+/* =====================================================================
+   АДМИНКА: современные карточки, кнопки, инпуты (стиль WP/Notion)
+   ===================================================================== */
+
+/* Белые карточки с мягкой тенью */
+.admin .card,
+.admin .pages-item,
+.admin .form-item,
+.admin .lead,
+.admin .media-card,
+.admin .settings-item,
+.admin .page-block,
+.admin .form-field,
+.admin .submission,
+.admin .form-editor,
+.admin .page-form,
+.admin .submissions,
+.admin .users-table {
+  background: #fff;
+  border: 1px solid #e2e4e7;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.05);
+  border-radius: 8px;
+}
+
+/* Кнопки: аккуратные, WP-синие */
+.admin .btn--primary,
+.admin a.btn--primary {
+  background: #2271b1;
+  color: #fff;
+  border: 1px solid #2271b1;
+}
+
+.admin .btn--primary:hover,
+.admin a.btn--primary:hover {
+  background: #135e96;
+  border-color: #135e96;
+}
+
+.admin .btn--outline,
+.admin a.btn--outline {
+  background: #f6f7f7;
+  color: #2271b1;
+  border: 1px solid #2271b1;
+}
+
+.admin .btn--outline:hover,
+.admin a.btn--outline:hover {
+  background: #f0f6fc;
+}
+
+.admin .btn--danger,
+.admin a.btn--danger {
+  background: #f6f7f7;
+  color: #d63638;
+  border: 1px solid #d63638;
+}
+
+.admin .btn--danger:hover,
+.admin a.btn--danger:hover {
+  background: #fcf0f1;
+}
+
+/* Инпуты: с фокус-кольцом как в WP */
+.admin .admin-input,
+.admin .admin-textarea {
+  border: 1px solid #8c8f94;
+  border-radius: 4px;
+  background: #fff;
+  color: #1f2937;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.admin .admin-input:focus,
+.admin .admin-textarea:focus {
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  outline: 2px solid transparent;
+}
+
+/* Статистика лидов — карточки-плитки */
+.admin .stat {
+  background: #fff;
+  border: 1px solid #e2e4e7;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.admin .stat--active {
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1, 0 1px 3px rgba(16, 24, 40, 0.08);
+}
+
+/* Статусы лидов — цветные бейджи */
+.admin .lead__status {
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* Таблицы */
+.admin .users-table__head {
+  background: #f6f7f7;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+}
+
+.admin .users-table__row {
+  border-top: 1px solid #e2e4e7;
+  background: #fff;
+}
+
+.admin .users-table__row--edit {
+  background: #f0f6fc;
+}
+
+/* Заголовок-хлебные крошки в топбаре заменён на page title, но секции */
+.admin .admin-section__header h1 {
+  color: #1f2937;
+}
+
+/* Теги */
+.admin .tag {
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  color: #50575e;
+}
+
+.admin .tag--success {
+  background: #edfaef;
+  border-color: #b8e6bf;
+  color: #008a20;
+}
+
+/* Ссылки (в контенте страницы — как на сайте) */
+.admin a:not(.pc-block *) {
+  color: #2271b1;
+}
+
+/* Поле-лейбл */
+.admin .field span {
+  color: #50575e;
 }

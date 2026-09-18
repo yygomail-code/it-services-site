@@ -1,0 +1,20 @@
+@if (filters) {
+  <div class="filters" role="tablist" aria-label="Фильтр по категориям">
+    @for (category of categories; track category) {
+      <button
+        type="button"
+        class="filter"
+        [class.filter--active]="activeCategory === category"
+        (click)="setCategory(category)"
+      >
+        {{ category === 'all' ? 'Все' : category }}
+      </button>
+    }
+  </div>
+}
+
+<div class="cases-grid">
+  @for (case of visibleCases; track case.slug) {
+    <app-case-card [case]="case" />
+  }
+</div>

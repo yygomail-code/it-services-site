@@ -1,0 +1,255 @@
+.canvas-block {
+  position: relative;
+}
+
+/* Гуттер: ручка и «+» */
+.canvas-block__gutter {
+  position: absolute;
+  top: 0;
+  left: -40px;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.canvas-block:hover .canvas-block__gutter,
+.canvas-block--selected .canvas-block__gutter {
+  opacity: 1;
+}
+
+.canvas-block__grip,
+.canvas-block__plus {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  background: transparent;
+  color: #98a2b3;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.canvas-block__grip {
+  cursor: grab;
+}
+
+.canvas-block__grip:active {
+  cursor: grabbing;
+}
+
+.canvas-block__grip:hover,
+.canvas-block__plus:hover {
+  background: #eef0f3;
+  color: #1d2327;
+}
+
+.canvas-block--selected > .canvas-block__body {
+  outline: 2px solid rgba(24, 119, 242, 0.45);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Заголовок и список: мост-правила для динамических элементов TipTap
+   лежат в src/styles/site-content.scss (инкапсуляция компонента их не видит) */
+
+/* Заглушки и вспомогательные элементы */
+.canvas-block__placeholder {
+  width: 100%;
+  border: 1px dashed #c9ced6;
+  background: #fafbfc;
+  color: var(--color-muted);
+  border-radius: 8px;
+  padding: 1.4rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.canvas-block__placeholder:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.canvas-block__gallery-item {
+  position: relative;
+  display: block;
+}
+
+.canvas-block__gallery-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 5px;
+  background: rgba(15, 23, 42, 0.65);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  font-size: 0.7rem;
+}
+
+.canvas-block__gallery-item:hover .canvas-block__gallery-remove {
+  opacity: 1;
+}
+
+/* Живой контент (форма, каталоги): выглядит как на сайте, но не кликается —
+   клик выбирает блок, настройки открываются из меню ⠿ */
+.canvas-block__live {
+  pointer-events: none;
+  user-select: none;
+}
+
+.canvas-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--color-muted);
+}
+
+.canvas-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.canvas-preset {
+  border: 1px solid var(--color-border);
+  background: #fff;
+  color: var(--color-text);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.canvas-preset:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.canvas-preset--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.canvas-block__html {
+  width: 100%;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 0.8rem;
+}
+
+/* Меню блока */
+.canvas-menu {
+  position: absolute;
+  top: 24px;
+  left: -40px;
+  z-index: 40;
+  min-width: 164px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+  padding: 4px;
+}
+
+.canvas-menu__item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 7px 10px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #1d2327;
+}
+
+.canvas-menu__item:hover {
+  background: #f0f2f5;
+}
+
+.canvas-menu__item--danger {
+  color: var(--color-danger);
+}
+
+/* Поповер настроек */
+.canvas-pop {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  z-index: 40;
+  width: 284px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+  padding: 0.75rem 0.85rem;
+}
+
+.canvas-pop__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.canvas-pop__close {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.canvas-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
+.canvas-check {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.canvas-pop__img {
+  position: relative;
+  margin-bottom: 0.4rem;
+}
+
+.canvas-pop__img img {
+  width: 100%;
+  border-radius: 6px;
+  display: block;
+}
+
+.canvas-pop__img-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 5px;
+  background: rgba(15, 23, 42, 0.65);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.68rem;
+}

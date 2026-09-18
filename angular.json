@@ -54,7 +54,7 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
+                  "maximumWarning": "6kB",
                   "maximumError": "8kB"
                 }
               ],
@@ -67,9 +67,6 @@
             },
             "static": {
               "outputMode": "static",
-              "prerender": {
-                "routes": ["/"]
-              },
               "outputHashing": "all",
               "optimization": true,
               "sourceMap": false

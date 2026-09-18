@@ -12,9 +12,40 @@ export const serverRoutes: ServerRoute[] = [
   {
     path: 'services/:slug',
     renderMode: RenderMode.Prerender,
-    getPrerenderParams: () => import('./data/services.data').then((m) =>
-      m.SERVICES.map((s) => ({ slug: s.slug })),
-    ),
+    getPrerenderParams: async () => {
+      const base = process.env['PRERENDER_API_BASE'] ?? 'http://127.0.0.1:8090';
+      try {
+        const res = await fetch(`${base}/api/services.php?action=catalog&kind=service&per_page=50`);
+        const json = (await res.json()) as { ok?: boolean; items?: Array<{ slug?: string }> };
+        return (json.items ?? [])
+          .map((item) => item.slug)
+          .filter((slug): slug is string => !!slug)
+          .map((slug) => ({ slug }));
+      } catch {
+        return [];
+      }
+    },
+  },
+  {
+    path: 'products',
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: 'products/:slug',
+    renderMode: RenderMode.Prerender,
+    getPrerenderParams: async () => {
+      const base = process.env['PRERENDER_API_BASE'] ?? 'http://127.0.0.1:8090';
+      try {
+        const res = await fetch(`${base}/api/services.php?action=catalog&kind=product&per_page=50`);
+        const json = (await res.json()) as { ok?: boolean; items?: Array<{ slug?: string }> };
+        return (json.items ?? [])
+          .map((item) => item.slug)
+          .filter((slug): slug is string => !!slug)
+          .map((slug) => ({ slug }));
+      } catch {
+        return [];
+      }
+    },
   },
   {
     path: 'portfolio',
@@ -48,6 +79,14 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Prerender,
   },
   {
+    path: 'cookie-policy',
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: 'pages/:slug',
+    renderMode: RenderMode.Client,
+  },
+  {
     path: 'admin/login',
     renderMode: RenderMode.Client,
   },
@@ -65,6 +104,6 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: '**',
-    renderMode: RenderMode.Prerender,
+    renderMode: RenderMode.Client,
   },
 ];

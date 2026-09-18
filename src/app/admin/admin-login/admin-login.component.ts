@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -13,6 +13,7 @@ export class AdminLoginComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   form!: FormGroup;
   error = '';
@@ -29,6 +30,7 @@ export class AdminLoginComponent implements OnInit {
       if (res.user && (res.user.role === 'manager' || res.user.role === 'admin')) {
         this.router.navigate(['/admin/leads']);
       }
+      this.cdr.markForCheck();
     });
     // Гарантированно получаем CSRF до первой отправки
     this.auth.ensureCsrf().subscribe();
@@ -44,6 +46,7 @@ export class AdminLoginComponent implements OnInit {
     }
     this.loading = true;
     this.error = '';
+    this.cdr.markForCheck();
     this.auth.login(this.form.value.login, this.form.value.password).subscribe({
       next: (res) => {
         if (res.user) {
@@ -52,10 +55,12 @@ export class AdminLoginComponent implements OnInit {
           this.error = res.error || 'Ошибка входа';
           this.loading = false;
         }
+        this.cdr.markForCheck();
       },
       error: (err) => {
         this.error = err.error?.error || 'Ошибка входа';
         this.loading = false;
+        this.cdr.markForCheck();
       },
     });
   }

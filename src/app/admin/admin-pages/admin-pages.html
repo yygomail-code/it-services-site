@@ -1,0 +1,46 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div>
+      <h1>Страницы</h1>
+      <p class="text-muted">Все страницы сайта: главная, услуги, портфолио и дополнительные</p>
+    </div>
+    <a routerLink="/admin/pages/new" class="btn btn--primary">+ Новая страница</a>
+  </div>
+
+  @if (error) {
+    <p class="admin-error">{{ error }}</p>
+  }
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else if (pages.length === 0) {
+    <p class="text-muted">Страниц пока нет. Нажмите «+ Новая страница».</p>
+  } @else {
+    <div class="pages-list">
+      @for (page of pages; track trackPage($index, page)) {
+        <div class="pages-item">
+          <div class="pages-item__main">
+            <a class="pages-item__title" [routerLink]="['/admin/pages', page.id]">{{ page.title }}</a>
+            <code class="pages-item__slug">/{{ page.slug }}</code>
+          </div>
+          <div class="pages-item__meta">
+            @if (page.status === 'published') {
+              <span class="tag tag--success">Опубликована</span>
+            } @else {
+              <span class="tag">Черновик</span>
+            }
+            @if (page.roles) {
+              <span class="tag">{{ page.roles.length ? 'доступ по ролям' : 'скрыта' }}</span>
+            }
+          </div>
+          <div class="pages-item__actions">
+            <a routerLink="/admin/pages/{{ page.id }}" class="btn btn--small">Изменить</a>
+            <button type="button" class="btn btn--small btn--danger" (click)="remove(page)">
+              Удалить
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>

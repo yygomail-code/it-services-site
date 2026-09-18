@@ -1,4 +1,4 @@
-import { Component, HostBinding, OnInit } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -8,7 +8,9 @@ import { RouterLink } from '@angular/router';
   styleUrl: './cookie-consent.scss',
 })
 export class CookieConsentComponent implements OnInit {
-  @HostBinding('class.cookie-consent--visible') visible = false;
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  visible = false;
 
   ngOnInit(): void {
     if (typeof document === 'undefined') {
@@ -22,21 +24,20 @@ export class CookieConsentComponent implements OnInit {
       if (!consent) {
         setTimeout(() => {
           this.visible = true;
-        }, 800);
+          this.cdr.detectChanges();
+        }, 500);
       }
     } catch {
       this.visible = true;
+      this.cdr.detectChanges();
     }
   }
 
+  /** Плашка не закрывается, пока пользователь не нажмёт «Принять». */
   accept(): void {
     this.setConsent('accepted');
     this.visible = false;
-  }
-
-  decline(): void {
-    this.setConsent('declined');
-    this.visible = false;
+    this.cdr.detectChanges();
   }
 
   private setConsent(value: string): void {

@@ -1,0 +1,238 @@
+.admin-error {
+  color: var(--color-danger);
+}
+
+.admin-saved {
+  color: var(--color-success);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* Шапка: заголовок слева, кнопки справа */
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* ---------------- Параметры страницы (сворачиваемая панель) ---------------- */
+.page-settings {
+  background: #fff;
+  border: 1px solid #e2e4e7;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  margin-bottom: 1rem;
+}
+
+.page-settings__summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.page-settings__summary::-webkit-details-marker {
+  display: none;
+}
+
+.page-settings__summary::before {
+  content: '▸';
+  font-size: 0.75rem;
+  color: #8c8f94;
+  transition: transform 0.15s;
+}
+
+.page-settings[open] .page-settings__summary::before {
+  transform: rotate(90deg);
+}
+
+.page-settings__summary:hover .page-settings__title {
+  color: #2271b1;
+}
+
+.page-settings__title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.page-settings__hint {
+  font-size: 0.78rem;
+  color: #8c8f94;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-settings__body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid #f0f0f1;
+}
+
+.page-side {
+  background: #fafafa;
+  border: 1px solid #e2e4e7;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.page-side h3 {
+  margin: 0 0 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #1d2327;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #f0f0f1;
+}
+
+/* Строки полей: подпись слева, поле занимает всю оставшуюся ширину */
+.page-side .field {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.page-side .field > span {
+  width: 170px;
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  color: #50575e;
+}
+
+.page-side .field .admin-input,
+.page-side .field .admin-textarea {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Многострочное поле: подпись по верхнему краю */
+.page-side .field--area {
+  align-items: flex-start;
+}
+
+.page-side .field--area > span {
+  padding-top: 0.45rem;
+}
+
+.page-side .field:last-child {
+  margin-bottom: 0;
+}
+
+/* Доступ по ролям */
+.page-access {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.page-access__text {
+  font-size: 0.82rem;
+  color: #50575e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-opt {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: 1px solid #dcdcde;
+  border-radius: 5px;
+  background: #fff;
+  color: #c3c4c7;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  line-height: 1;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.row-opt:hover {
+  border-color: #2271b1;
+  color: #2271b1;
+}
+
+.row-opt--eye svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Доступ: всем — зелёный, часть ролей — жёлтый, никому — красный */
+.row-opt--eye-all,
+.row-opt--eye-all:hover {
+  color: #00a32a;
+  border-color: #a7d8b4;
+  background: #effaf1;
+}
+
+.row-opt--eye-partial,
+.row-opt--eye-partial:hover {
+  color: #996800;
+  border-color: #e0c78a;
+  background: #fdf8e8;
+}
+
+.row-opt--eye-none,
+.row-opt--eye-none:hover {
+  color: #d63638;
+  border-color: #e5b3b4;
+  background: #fdf0f0;
+}
+
+/* ---------------- Визуальный редактор: на всю ширину ---------------- */
+.page-editor {
+  min-width: 0;
+}
+
+@media (max-width: 700px) {
+  .page-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-actions {
+    justify-content: flex-end;
+  }
+}
+
+/* Баннер несохранённого черновика */
+.page-draft {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: 0.65rem 0.9rem;
+  background: #fdf8e8;
+  border: 1px solid #e0c78a;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: #6b4e00;
+}
+
+.page-draft__text {
+  flex: 1;
+  min-width: 200px;
+}

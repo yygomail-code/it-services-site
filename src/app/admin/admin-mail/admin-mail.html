@@ -1,0 +1,271 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div class="mail-head">
+      <h1>Почта</h1>
+      @if (!formOpen) {
+        <button type="button" class="btn btn--primary" (click)="startCreate()">+ Сервис</button>
+      }
+    </div>
+    <p class="text-muted">
+      Подключения к сервисам отправки писем. Разные сервисы можно использовать для разных
+      уведомлений: заявки, регистрация, действия, покупки.
+    </p>
+  </div>
+
+  @if (formOpen) {
+    <div class="mail-card">
+      <div class="mail-card__head">
+        <h3>{{ editingId ? 'Настройки сервиса' : 'Новый сервис' }}</h3>
+        <div class="mail-card__head-actions">
+          <button type="button" class="btn btn--outline" (click)="cancelForm()">← Список сервисов</button>
+          <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving">
+            {{ saving ? 'Сохранение…' : (editingId ? 'Сохранить' : 'Создать') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="mail-form">
+        <label class="mail-field">
+          <span>Название</span>
+          <input class="admin-input" [value]="name" (input)="onName($any($event.target).value)" placeholder="Например: Яндекс — заявки" />
+        </label>
+
+        <label class="mail-field">
+          <span>Сервис</span>
+          <select class="admin-input" [value]="provider" (change)="onProvider($any($event.target).value)">
+            @for (p of presetList; track p.code) {
+              <option [value]="p.code">{{ p.preset.label }}</option>
+            }
+          </select>
+        </label>
+
+        @if (currentHint) {
+          <p class="mail-hint">{{ currentHint }}</p>
+        }
+
+        <div class="mail-row">
+          <label class="mail-field mail-field--host">
+            <span>SMTP-сервер</span>
+            <input class="admin-input" [value]="host" (input)="onHost($any($event.target).value)" placeholder="smtp.yandex.ru" />
+          </label>
+          <label class="mail-field mail-field--port">
+            <span>Порт</span>
+            <input class="admin-input" type="number" [value]="port" (input)="onPort($any($event.target).value)" placeholder="465" />
+          </label>
+          <label class="mail-field mail-field--enc">
+            <span>Шифрование</span>
+            <select class="admin-input" [value]="encryption" (change)="onEncryption($any($event.target).value)">
+              <option value="ssl">SSL (465)</option>
+              <option value="tls">STARTTLS (587)</option>
+              <option value="none">Без шифрования</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="mail-row">
+          <label class="mail-field">
+            <span>Логин</span>
+            <input class="admin-input" [value]="username" (input)="onUsername($any($event.target).value)" placeholder="user@yandex.ru" autocomplete="off" />
+          </label>
+          <label class="mail-field">
+            <span>Пароль{{ editingId && hasPassword ? ' (задан)' : '' }}</span>
+            <input class="admin-input" type="password" [value]="password" (input)="onPassword($any($event.target).value)" [placeholder]="editingId ? 'оставьте пустым, чтобы не менять' : 'пароль приложения'" autocomplete="new-password" />
+          </label>
+        </div>
+
+        <div class="mail-row">
+          <label class="mail-field">
+            <span>Адрес отправителя</span>
+            <input class="admin-input" [value]="fromEmail" (input)="onFromEmail($any($event.target).value)" placeholder="user@yandex.ru" />
+          </label>
+          <label class="mail-field">
+            <span>Имя отправителя</span>
+            <input class="admin-input" [value]="fromName" (input)="onFromName($any($event.target).value)" placeholder="Например: Литвинов Антон" />
+          </label>
+        </div>
+
+        <div class="mail-row">
+          <label class="mail-field">
+            <span>Назначение</span>
+            <select class="admin-input" [value]="purpose" (change)="onPurpose($any($event.target).value)">
+              @for (p of purposeList; track p.code) {
+                <option [value]="p.code">{{ p.label }}</option>
+              }
+            </select>
+          </label>
+          <label class="mail-field mail-field--toggle">
+            <span>Состояние</span>
+            <label class="mail-toggle">
+              <input type="checkbox" [checked]="active" (change)="onActive($any($event.target).checked)" />
+              <span>{{ active ? 'Включён' : 'Выключен' }}</span>
+            </label>
+          </label>
+        </div>
+      </div>
+
+      @if (saveError) {
+        <p class="admin-error">{{ saveError }}</p>
+      }
+    </div>
+  } @else {
+    @if (error) {
+      <p class="admin-error">{{ error }}</p>
+    }
+
+    @if (testMessage) {
+      <p class="mail-test-message">{{ testMessage }}</p>
+    }
+
+    @if (loading) {
+      <p class="text-muted">Загрузка…</p>
+    } @else {
+      <div class="mail-card">
+        <div class="mail-list">
+          @for (service of services; track service.id) {
+            <div class="mail-row-item" [class.mail-row-item--off]="!service.active">
+              <div class="mail-row-item__main">
+                <strong>{{ service.name }}</strong>
+                <span class="mail-row-item__sub">
+                  {{ providerLabel(service.provider) }} · {{ service.username }} · {{ service.host }}:{{ service.port }}
+                </span>
+                <span class="mail-row-item__sub">
+                  От: {{ service.from_email }} · {{ purposeLabel(service.purpose) }}
+                </span>
+              </div>
+
+              <div class="mail-row-item__status">
+                @if (service.last_check_at) {
+                  @if (service.last_check_ok) {
+                    <span class="tag tag--success" [title]="service.last_check_error || ''">отправка ок</span>
+                  } @else {
+                    <span class="tag tag--danger" [title]="service.last_check_error || ''">ошибка</span>
+                  }
+                } @else {
+                  <span class="tag">не проверялся</span>
+                }
+                @if (!service.active) {
+                  <span class="tag">выключен</span>
+                }
+              </div>
+
+              <div class="mail-row-item__tools">
+                <button type="button" class="btn btn--small" (click)="test(service)" [disabled]="testing" title="Отправить тестовое письмо">
+                  Проверить
+                </button>
+                <button type="button" class="btn-icon" title="Изменить" (click)="startEdit(service)">✎</button>
+                <button type="button" class="btn-icon btn-icon--danger" title="Удалить" (click)="remove(service)">✕</button>
+              </div>
+            </div>
+          } @empty {
+            <p class="text-muted">Сервисов нет. Добавьте первый — например, Яндекс.Почту для заявок.</p>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="mail-card">
+      <div class="mail-card__head">
+        <h3>Очередь писем</h3>
+        <div class="mail-card__head-actions">
+          @if (queueCounts['pending']) {
+            <span class="tag">в очереди: {{ queueCounts['pending'] }}</span>
+          }
+          @if (queueCounts['failed']) {
+            <span class="tag tag--danger">с ошибкой: {{ queueCounts['failed'] }}</span>
+          }
+          <button type="button" class="btn btn--small" (click)="processQueue()">Обработать очередь</button>
+        </div>
+      </div>
+      <p class="mail-hint">
+        Письма сохраняются здесь до отправки: при сбое SMTP попытки повторяются автоматически
+        (при заходах в админку и из cron), после исчерпания попыток письмо можно отправить вручную.
+        Отправленные старше 30 дней удаляются автоматически.
+      </p>
+
+      @if (queueMessage) {
+        <p class="mail-test-message">{{ queueMessage }}</p>
+      }
+      @if (queueError) {
+        <p class="admin-error">{{ queueError }}</p>
+      }
+
+      @if (queue.length === 0) {
+        <p class="text-muted">Очередь пуста.</p>
+      } @else {
+        <div class="queue-list">
+          @for (item of queue; track item.id) {
+            <div class="queue-item" [class.queue-item--failed]="item.status === 'failed'">
+              <div class="queue-item__main">
+                <strong>{{ item.subject }}</strong>
+                <span class="queue-item__sub">{{ item.to_email }} · {{ item.created_at }}</span>
+                @if (item.last_error) {
+                  <span class="queue-item__error">{{ item.last_error }}</span>
+                }
+              </div>
+              <span
+                class="tag"
+                [class.tag--success]="item.status === 'sent'"
+                [class.tag--danger]="item.status === 'failed'"
+              >
+                {{ queueStatusLabel(item.status) }}
+              </span>
+              <span class="queue-item__attempts" title="Попыток отправки">{{ item.attempts }}/{{ item.max_attempts }}</span>
+              @if (item.status !== 'sent') {
+                <button type="button" class="btn btn--small" (click)="retryQueueItem(item)">Отправить ещё раз</button>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="mail-card">
+      <div class="mail-card__head">
+        <h3>Запуск по расписанию</h3>
+        <div class="mail-card__head-actions">
+          @if (cronHasKey) {
+            <span class="tag tag--success">ссылка активна</span>
+            <button type="button" class="btn btn--small" (click)="generateCronLink()">Перегенерировать</button>
+            <button type="button" class="btn btn--small" (click)="removeCronLink()">Отключить</button>
+          } @else {
+            <button type="button" class="btn btn--small btn--primary" (click)="generateCronLink()">
+              Сгенерировать ссылку
+            </button>
+          }
+        </div>
+      </div>
+      <p class="mail-hint">
+        Ссылка запускает отправку писем из очереди без входа в админку: добавьте её в cron
+        хостинга (запуск по URL, каждые 5 минут) или во внешний сервис расписаний.
+        Не передавайте ссылку посторонним — перегенерация отключает старую.
+      </p>
+
+      @if (cronMessage) {
+        <p class="mail-test-message">{{ cronMessage }}</p>
+      }
+      @if (cronError) {
+        <p class="admin-error">{{ cronError }}</p>
+      }
+
+      @if (cronHasKey && cronLink) {
+        <div class="cron-link">
+          <input
+            class="admin-input cron-link__input"
+            #cronInput
+            readonly
+            [value]="cronLink"
+            (focus)="cronInput.select()"
+          />
+          <button type="button" class="btn btn--small" (click)="copyCronLink(cronInput)">
+            {{ cronCopied ? '✓ Скопировано' : 'Скопировать' }}
+          </button>
+        </div>
+        <p class="mail-hint">
+          Проверить можно в браузере: откройте ссылку — она вернёт результат обработки очереди.
+        </p>
+      } @else {
+        <p class="text-muted">Ссылка не сгенерирована.</p>
+      }
+    </div>
+  }
+</section>

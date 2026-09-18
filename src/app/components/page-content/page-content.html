@@ -1,0 +1,144 @@
+@if (sections.length) {
+  <div class="page-content">
+    @for (sec of sections; track trackSection($index, sec)) {
+      <section
+        class="pc-section"
+        [class.pc-section--light]="sec.background === 'light'"
+        [class.pc-section--dark]="sec.background === 'dark'"
+        [class.pc-section--accent]="sec.background === 'accent'"
+        [class.pc-section--hero]="sec.background === 'hero'"
+      >
+        <div
+          class="pc-section__inner"
+          [class.pc-section__inner--gap-none]="sec.gap === 'none'"
+          [class.pc-section__inner--gap-small]="sec.gap === 'small'"
+          [class.pc-section__inner--gap-large]="sec.gap === 'large'"
+        >
+          <div
+            class="pc-grid"
+            [class.pc-grid--align-middle]="sec.align === 'middle'"
+            [class.pc-grid--align-bottom]="sec.align === 'bottom'"
+            [style.--pc-cols]="sec.columns"
+            [style.--pc-widths]="widths(sec)"
+          >
+            @for (col of sec.cols; track trackColumn($index, col)) {
+              <div class="pc-col">
+                @for (block of col.blocks; track trackBlock($index, block)) {
+                  @switch (block.type) {
+                    @case ('text') {
+                      <div
+                        class="pc-block pc-block--text"
+                        [class.pc-block--align-center]="block.align === 'center'"
+                        [class.pc-block--align-right]="block.align === 'right'"
+                        [style.fontSize]="block.fontSize || null"
+                        [style.fontFamily]="block.fontFamily || null"
+                        [innerHTML]="textHtml(block.text)"
+                      ></div>
+                    }
+                    @case ('heading') {
+                      @switch (block.level) {
+                        @case ('h1') {
+                          <h1 class="pc-block pc-heading pc-heading--h1" [class.pc-block--align-center]="block.align === 'center'" [class.pc-block--align-right]="block.align === 'right'" [style.fontSize]="block.fontSize || null" [style.fontFamily]="block.fontFamily || null" [innerHTML]="safeHtml(block.text)"></h1>
+                        }
+                        @case ('h3') {
+                          <h3 class="pc-block pc-heading pc-heading--h3" [class.pc-block--align-center]="block.align === 'center'" [class.pc-block--align-right]="block.align === 'right'" [style.fontSize]="block.fontSize || null" [style.fontFamily]="block.fontFamily || null" [innerHTML]="safeHtml(block.text)"></h3>
+                        }
+                        @case ('h4') {
+                          <h4 class="pc-block pc-heading pc-heading--h4" [class.pc-block--align-center]="block.align === 'center'" [class.pc-block--align-right]="block.align === 'right'" [style.fontSize]="block.fontSize || null" [style.fontFamily]="block.fontFamily || null" [innerHTML]="safeHtml(block.text)"></h4>
+                        }
+                        @default {
+                          <h2 class="pc-block pc-heading pc-heading--h2" [class.pc-block--align-center]="block.align === 'center'" [class.pc-block--align-right]="block.align === 'right'" [style.fontSize]="block.fontSize || null" [style.fontFamily]="block.fontFamily || null" [innerHTML]="safeHtml(block.text)"></h2>
+                        }
+                      }
+                    }
+                    @case ('image') {
+                      <figure
+                        class="pc-block pc-block--image"
+                        [class.pc-block--align-center]="block.align === 'center'"
+                        [class.pc-block--align-right]="block.align === 'right'"
+                        [style.maxWidth]="block.width !== 'auto' && block.width !== '100%' ? block.width : null"
+                      >
+                        <img [src]="block.url" [alt]="block.alt || block.caption || ''" loading="lazy" />
+                        @if (block.caption) {
+                          <figcaption>{{ block.caption }}</figcaption>
+                        }
+                      </figure>
+                    }
+                    @case ('gallery') {
+                      <div
+                        class="pc-block pc-block--gallery"
+                        [class.pc-gallery--cols]="block.columns"
+                        [style.--pc-gallery-cols]="block.columns || null"
+                      >
+                        @for (img of block.images; track img) {
+                          <img [src]="img" loading="lazy" alt="" />
+                        }
+                      </div>
+                    }
+                    @case ('form') {
+                      <div class="pc-block pc-block--form" [style.maxWidth]="formMaxWidth(block)">
+                        <app-form-render [formId]="block.formId" />
+                      </div>
+                    }
+                    @case ('button') {
+                      <div class="pc-block pc-block--button" [class.pc-block--align-center]="block.align === 'center'" [class.pc-block--align-right]="block.align === 'right'">
+                        <a
+                          class="btn"
+                          [class.btn--primary]="block.style === 'primary'"
+                          [class.btn--outline]="block.style === 'outline'"
+                          [class.btn--ghost]="block.style === 'ghost'"
+                          [href]="block.url"
+                          [target]="block.target"
+                          [rel]="block.target === '_blank' ? 'noopener noreferrer' : null"
+                        >{{ block.text }}</a>
+                      </div>
+                    }
+                    @case ('divider') {
+                      <hr class="pc-block pc-block--divider" />
+                    }
+                    @case ('quote') {
+                      <blockquote class="pc-block pc-block--quote">
+                        <p [innerHTML]="safeHtml(block.text)"></p>
+                        @if (block.author) {
+                          <cite>{{ block.author }}</cite>
+                        }
+                      </blockquote>
+                    }
+                    @case ('list') {
+                      @if (block.ordered) {
+                        <ol class="pc-block pc-block--list">
+                          @for (item of block.items; track $index) {
+                            <li [innerHTML]="safeHtml(item)"></li>
+                          }
+                        </ol>
+                      } @else {
+                        <ul class="pc-block pc-block--list">
+                          @for (item of block.items; track $index) {
+                            <li [innerHTML]="safeHtml(item)"></li>
+                          }
+                        </ul>
+                      }
+                    }
+                    @case ('html') {
+                      <div class="pc-block pc-block--html" [innerHTML]="safeHtml(block.html)"></div>
+                    }
+                    @case ('services') {
+                      <div class="pc-block pc-block--catalog">
+                        <app-services-grid />
+                      </div>
+                    }
+                    @case ('cases') {
+                      <div class="pc-block pc-block--catalog">
+                        <app-cases-grid [limit]="block.limit || 0" [filters]="block.filters === true" />
+                      </div>
+                    }
+                  }
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+    }
+  </div>
+}

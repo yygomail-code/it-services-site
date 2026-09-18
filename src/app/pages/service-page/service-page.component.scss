@@ -1,0 +1,435 @@
+.breadcrumbs {
+  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.75rem 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.breadcrumbs a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.breadcrumbs span {
+  color: var(--color-text);
+}
+
+.svc {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.svc__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.svc__stub {
+  padding: 2rem 0;
+}
+
+.svc__stub h1 {
+  margin: 0 0 0.5rem;
+}
+
+.svc__gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.svc__gallery-main {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-primary-bg);
+  aspect-ratio: 16 / 10;
+}
+
+.svc__gallery-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.svc__gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-text);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.svc__gallery-nav:hover {
+  background: #fff;
+}
+
+.svc__gallery-nav--prev {
+  left: 0.6rem;
+}
+
+.svc__gallery-nav--next {
+  right: 0.6rem;
+}
+
+.svc__gallery-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.svc__thumb {
+  width: 72px;
+  height: 54px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+}
+
+.svc__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 6px;
+}
+
+.svc__thumb--active {
+  border-color: var(--color-primary);
+}
+
+.svc__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.svc__title h1 {
+  margin: 0;
+}
+
+/* Заглушка, если у позиции нет фото */
+.svc__noimg {
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  aspect-ratio: 16 / 10;
+  background: #eef0f2;
+  color: #9aa2ab;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.svc__noimg svg {
+  width: 46px;
+  height: 46px;
+}
+
+.svc__category {
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+}
+
+.svc__category:hover {
+  border-color: var(--color-primary);
+}
+
+.svc__badge {
+  font-size: 0.75rem;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+
+.svc__rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+}
+
+.svc__stars {
+  color: #f5a623;
+  letter-spacing: 0.05em;
+}
+
+.svc__rating-count {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.svc__lead {
+  font-size: 1.05rem;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.svc__price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.svc__price-value {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.svc__price-note {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.svc__payments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.svc__payments li {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+}
+
+.svc__description {
+  position: relative;
+}
+
+.svc__description-body {
+  overflow: hidden;
+  max-height: 8.4em;
+}
+
+.svc__description-body ::ng-deep > :first-child {
+  margin-top: 0;
+}
+
+.svc__description-body ::ng-deep > :last-child {
+  margin-bottom: 0;
+}
+
+.svc__description:not(.svc__description--open)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2.5em;
+  background: linear-gradient(rgba(255, 255, 255, 0), var(--color-bg, #f6f7f9));
+  pointer-events: none;
+}
+
+.svc__description--open .svc__description-body {
+  max-height: none;
+}
+
+.svc__more {
+  align-self: flex-start;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
+.svc__address {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.svc__map-btn {
+  align-self: flex-start;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  color: var(--color-primary);
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.88rem;
+}
+
+.svc__map-btn:hover {
+  border-color: var(--color-primary);
+}
+
+.svc__aside .card {
+  position: sticky;
+  top: 84px;
+}
+
+.svc__aside h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.2rem;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.section--cta {
+  background: var(--color-dark);
+}
+
+.cta-box {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto;
+  color: #fff;
+}
+
+.cta-box h2 {
+  color: #fff;
+}
+
+.cta-box p {
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 1.5rem;
+}
+
+/* Модальная карта: перетаскивается за шапку, закрывается крестиком или кликом по фону */
+.map-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(15, 23, 42, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.map-modal__box {
+  width: min(920px, 100%);
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  will-change: transform;
+}
+
+.map-modal__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.9rem;
+  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+  cursor: grab;
+  user-select: none;
+}
+
+.map-modal__bar:active {
+  cursor: grabbing;
+}
+
+.map-modal__title {
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-modal__close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: #f1f3f5;
+  color: var(--color-text);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.map-modal__close:hover {
+  background: #e5e8eb;
+}
+
+.map-modal__body {
+  height: min(60vh, 520px);
+}
+
+.map-modal__body iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Липкая панель быстрых действий на мобильном: заявка и звонок всегда под рукой */
+.svc-cta-bar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .svc {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .svc__aside .card {
+    position: static;
+  }
+
+  .svc-cta-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.6rem 1rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+    background: #fff;
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -6px 18px rgba(15, 23, 42, 0.08);
+  }
+
+  .svc-cta-bar .btn {
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+  }
+}

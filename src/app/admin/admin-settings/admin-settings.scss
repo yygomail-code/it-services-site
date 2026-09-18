@@ -2,53 +2,108 @@
   color: var(--color-danger);
 }
 
-.settings-list {
+.admin-saved {
+  color: var(--color-success);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.settings-form {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  max-width: 560px;
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .settings-item {
   background: #fff;
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+  padding: 0.75rem 1rem;
 }
 
-.settings-item__head {
+.settings-item--invalid {
+  border-color: var(--color-danger);
+}
+
+.settings-item__row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .settings-item__label {
+  flex: 0 0 170px;
   font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.settings-item__actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.saved {
-  color: var(--color-success);
   font-size: 0.85rem;
-  font-weight: 600;
+  color: #50575e;
 }
 
-.settings-item__input {
-  width: 100%;
+.settings-item__input,
+.settings-item__textarea {
+  flex: 1;
+  min-width: 0;
+  font-family: inherit;
+}
+
+.settings-item__textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.settings-item--area .settings-item__row {
+  align-items: flex-start;
+}
+
+.settings-item--area .settings-item__label {
+  padding-top: 0.55rem;
+}
+
+.settings-item__hint {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  margin: 0.35rem 0 0;
+  padding-left: 182px;
+}
+
+.settings-item__error {
+  font-size: 0.82rem;
+  color: var(--color-danger);
+  margin: 0.25rem 0 0;
+  padding-left: 182px;
+  font-weight: 500;
 }
 
 .admin-hint {
   font-size: 0.85rem;
-  margin-top: 1.25rem;
-  max-width: 560px;
+  margin-top: 1rem;
+}
+
+@media (max-width: 700px) {
+  .settings-item__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+  }
+
+  .settings-item__label {
+    flex: none;
+  }
+
+  .settings-item__hint,
+  .settings-item__error {
+    padding-left: 0;
+  }
 }

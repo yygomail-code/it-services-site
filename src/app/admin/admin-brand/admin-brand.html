@@ -1,0 +1,77 @@
+<section class="admin-section">
+  <div class="admin-section__header">
+    <div class="brand-head">
+      <h1>Бренд</h1>
+      <div class="brand-actions">
+        @if (saved) {
+          <span class="admin-saved">✓ Сохранено</span>
+        }
+        <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving">
+          {{ saving ? 'Сохранение…' : 'Сохранить' }}
+        </button>
+      </div>
+    </div>
+    <p class="text-muted">Единый логотип, название и метка — используются в шапке, футере и админке</p>
+  </div>
+
+  @if (error) {
+    <p class="admin-error">{{ error }}</p>
+  }
+
+  @if (loading) {
+    <p class="text-muted">Загрузка…</p>
+  } @else {
+    <div class="brand-form">
+      <div class="brand-card">
+        <h3>Логотип</h3>
+        <div class="logo-image">
+          @if (logo) {
+            <img class="logo-image__preview" [src]="logo" alt="Логотип" />
+          } @else {
+            <span class="logo-image__empty">Логотип не выбран</span>
+          }
+          <div class="logo-image__actions">
+            <button type="button" class="btn btn--small" (click)="openMediaPicker()">
+              {{ logo ? 'Заменить' : 'Выбрать из медиатеки' }}
+            </button>
+            @if (logo) {
+              <button type="button" class="btn-icon btn-icon--danger" title="Убрать логотип" (click)="clearLogo()">✕</button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="brand-card">
+        <h3>Название и метка</h3>
+        <div class="brand-row">
+          <span class="brand-row__label">Название</span>
+          <input
+            class="admin-input"
+            [value]="name"
+            (input)="onName($any($event.target).value)"
+            placeholder="Литвинов Антон"
+          />
+        </div>
+        <div class="brand-row">
+          <span class="brand-row__label">Метка</span>
+          <input
+            class="admin-input brand-row__mark"
+            [value]="mark"
+            (input)="onMark($any($event.target).value)"
+            maxlength="1"
+            placeholder="А"
+          />
+          <span class="brand-row__hint">1 буква. @if (!mark) { Если пусто — «{{ previewMark }}» }</span>
+        </div>
+      </div>
+
+      @if (saveError) {
+        <p class="admin-error">{{ saveError }}</p>
+      }
+    </div>
+  }
+
+  @if (mediaPickerOpen) {
+    <app-admin-media-picker (pick)="onLogoPicked($event)" (closed)="closeMediaPicker()" />
+  }
+</section>

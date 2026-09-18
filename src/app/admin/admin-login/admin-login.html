@@ -1,22 +1,29 @@
 <div class="login">
-  <form class="login__card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-    <div class="login__brand">
-      <span class="login__brand-mark">Л</span>
-      <h1>Вход в админку</h1>
-      <p class="text-muted">Разработка и сопровождение ИТ-услуг</p>
-    </div>
+  <div class="login__brand-side">
+    <div class="login__brand-side-mark">Л</div>
+    <h1>Админка</h1>
+    <p>Управление лидами, страницами, формами и настройками сайта ИТ-услуг.</p>
+  </div>
 
-    <input type="text" formControlName="login" placeholder="Логин" autocomplete="username" aria-label="Логин" />
-    <input type="password" formControlName="password" placeholder="Пароль" autocomplete="current-password" aria-label="Пароль" />
+  <div class="login__form-side">
+    <form class="login__card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="login__brand">
+        <h1>Вход в систему</h1>
+        <p>Разработка и сопровождение ИТ-услуг</p>
+      </div>
 
-    @if (error) {
-      <p class="login__error" role="alert">{{ error }}</p>
-    }
+      <input type="text" formControlName="login" placeholder="Логин" autocomplete="username" aria-label="Логин" />
+      <input type="password" formControlName="password" placeholder="Пароль" autocomplete="current-password" aria-label="Пароль" />
 
-    <button type="submit" class="btn btn--primary btn--block" [disabled]="loading">
-      {{ loading ? 'Вход…' : 'Войти' }}
-    </button>
+      @if (error) {
+        <p class="login__error" role="alert">{{ error }}</p>
+      }
 
-    <a class="login__back" routerLink="/">← На сайт</a>
-  </form>
+      <button type="submit" class="btn btn--primary btn--block" [disabled]="loading">
+        {{ loading ? 'Вход…' : 'Войти' }}
+      </button>
+
+      <a class="login__back" routerLink="/">← На сайт</a>
+    </form>
+  </div>
 </div>
